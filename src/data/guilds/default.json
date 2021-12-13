@@ -1,0 +1,17 @@
+{
+  "prefix": "!",
+  "greetings": [
+    "Hello!",
+    "Hello there!",
+    "How are you!",
+    "Howdy!",
+    "What's up chief?",
+    "Greetings",
+    "What's cracka-lackin?!",
+    "Sup bro",
+    "What's up boss?",
+    "Ah, hello human"
+  ],
+  "maxMessagesCleared": 100,
+  "designatedMusicChannelIds": []
+}

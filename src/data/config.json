@@ -1,0 +1,82 @@
+{
+  "name": "Z-Bot",
+  "version": "1.0.0",
+  "activities": [
+    {
+      "type": "PLAYING",
+      "name": " Squid Game"
+    },
+    {
+      "type": "LISTENING",
+      "name": " Never Gonna Give you Up"
+    },
+    {
+      "type": "WATCHING",
+      "name": " Dota 2 Reporter"
+    },
+    {
+      "type": "COMPETING",
+      "name": " TI"
+    },
+    {
+      "type": "PLAYING",
+      "name": " Tech Expansion"
+    },
+    {
+      "type": "PLAYING",
+      "name": " Tekkit"
+    },
+    {
+      "type": "PLAYING",
+      "name": " Pudge"
+    },
+    {
+      "type": "PLAYING",
+      "name": " MEEPOOO"
+    },
+    {
+      "type": "PLAYING",
+      "name": " carry Wisp mid"
+    },
+    {
+      "type": "PLAYING",
+      "name": " in vault 666"
+    },
+    {
+      "type": "WATCHING",
+      "name": " Gandhi nuke everyone"
+    },
+    {
+      "type": "WATCHING",
+      "name": " The Fellowship of the Ring"
+    },
+    {
+      "type": "WATCHING",
+      "name": " Two Towers"
+    },
+    {
+      "type": "WATCHING",
+      "name": " Return of the King"
+    },
+    {
+      "type": "LISTENING",
+      "name": " The Longest Johns"
+    },
+    {
+      "type": "LISTENING",
+      "name": " Stan Rogers"
+    },
+    {
+      "type": "LISTENING",
+      "name": " T-Swizzle"
+    },
+    {
+      "type": "PLAYING",
+      "name": " Connect Four"
+    },
+    {
+      "type": "PLAYING",
+      "name": " Monopoly City"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+node_modules
+src/data/.env
+src/data/guilds/*
+!src/data/guilds/default.json
