@@ -1,13 +1,12 @@
-const Discord = require("discord.js");
+const { MessageReaction, User } = require("discord.js");
 const Client = require("../structures/Client.js");
 const Event = require("../structures/Event.js");
 
 module.exports = new Event(
-  "messageReactionAdd",
   /**
    * @param {Client} client
-   * @param {Discord.MessageReaction} messageReaction
-   * @param {Discord.User} user
+   * @param {MessageReaction} messageReaction
+   * @param {User} user
    */
   (client, messageReaction, user) => {
     let message = messageReaction.message;

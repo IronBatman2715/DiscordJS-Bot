@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const { Message, MessageEmbed } = require("discord.js");
 const Client = require("../../structures/Client.js");
 const Command = require("../../structures/Command.js");
 const fs = require("fs");
@@ -47,6 +47,12 @@ module.exports = new Command({
   description: "Change/view guild settings.",
   permissions: ["ADMINISTRATOR"],
 
+  /**
+   * @param {Message} message
+   * @param {string[]} args
+   * @param {Client} client
+   * @returns
+   */
   async run(message, args, client) {
     console.log("Settings command:");
 
@@ -78,7 +84,7 @@ async function isValidSettingName(settingName) {
 }
 
 /**
- * @param {Discord.Message} message
+ * @param {Message} message
  * @param {Client} client
  */
 async function displayCurrentSettings(message, client) {
@@ -111,7 +117,7 @@ async function displayCurrentSettings(message, client) {
     });
   }
 
-  const currentSettingsEmbed = new Discord.MessageEmbed({
+  const currentSettingsEmbed = new MessageEmbed({
     title: `${message.guild.name} [id: \`${message.guildId}\`] Server-wide Settings`,
     description: `*Refer to* \`${currentGuildConfig.prefix}help\` *to change a setting.*`,
     timestamp: message.createdTimestamp,
@@ -129,7 +135,7 @@ async function displayCurrentSettings(message, client) {
 }
 
 /**
- * @param {Discord.Message} message
+ * @param {Message} message
  * @param {Client} client
  * @param {string} settingName
  * @param {string} newSettingValue

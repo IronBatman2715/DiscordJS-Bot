@@ -2,7 +2,6 @@ const Client = require("../structures/Client.js");
 const Event = require("../structures/Event.js");
 
 module.exports = new Event(
-  "ready",
   /**
    * @param {Client} client
    */

@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const { MessageActionRow, MessageSelectMenu } = require("discord.js");
 const Command = require("../../structures/Command.js");
 
 module.exports = new Command({
@@ -35,8 +35,8 @@ module.exports = new Command({
       };
     }
 
-    const row = new Discord.MessageActionRow().addComponents(
-      new Discord.MessageSelectMenu()
+    const row = new MessageActionRow().addComponents(
+      new MessageSelectMenu()
         .setCustomId("test-select-menu-id")
         .setPlaceholder("Choose something")
         .setMinValues(1)

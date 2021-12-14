@@ -1,15 +1,14 @@
 const snakeCase2Display = require("../functions/snakeCase2Display.js");
 const hasValidExtraArgs = require("../functions/hasValidExtraArgs.js");
 const isUser = require("../functions/isUser.js");
-const Discord = require("discord.js");
+const { Message } = require("discord.js");
 const Client = require("../structures/Client.js");
 const Event = require("../structures/Event.js");
 
 module.exports = new Event(
-  "messageCreate",
   /**
    * @param {Client} client
-   * @param {Discord.Message} message
+   * @param {Message} message
    */
   async (client, message) => {
     const { prefix, designatedMusicChannelIds } = client.getGuildConfig(

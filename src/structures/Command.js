@@ -1,15 +1,14 @@
-const Discord = require("discord.js");
+const { Message, Interaction, PermissionString } = require("discord.js");
 const Client = require("./Client.js");
 
 /**
- *
- * @param {Discord.Message | Discord.Interaction} message
+ * @param {Message | Interaction} message
  * @param {string[]} args
  * @param {Client} client
  */
 function RunFunction(message, args, client) {}
 
-class Command {
+module.exports = class Command {
   #defaultCommandOptions = {
     aliases: [],
     extraArguments: [],
@@ -21,7 +20,7 @@ class Command {
   };
 
   /**
-   * @typedef {{name: string, aliases?: string[], extraArguments?: ExtraArgumentOptions[], type?: string, description: string, permissions?: Discord.PermissionString[], run: RunFunction}} CommandOptions
+   * @typedef {{name: string, aliases?: string[], extraArguments?: ExtraArgumentOptions[], type?: string, description: string, permissions?: PermissionString[], run: RunFunction}} CommandOptions
    * @param {CommandOptions} options
    */
   constructor(options) {
@@ -48,6 +47,4 @@ class Command {
       }
     });
   }
-}
-
-module.exports = Command;
+};

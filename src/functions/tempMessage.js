@@ -1,7 +1,7 @@
-const Discord = require("discord.js");
+const { Message, TextChannel } = require("discord.js");
 
 /**
- * @param {Discord.TextChannel} channel
+ * @param {TextChannel} channel
  * @param {string} text
  * @param {boolean} showCountdown [default: true]
  * @param {Number} durationInSeconds [default: 10]
@@ -56,7 +56,7 @@ module.exports = async (
 /**
  * @param {Number} t
  * @param {Number} countdownIntervalInSeconds
- * @param {Discord.Message} tempMessage
+ * @param {Message} tempMessage
  * @param {string} text
  */
 function countdown(t, countdownIntervalInSeconds, tempMessage, newText) {

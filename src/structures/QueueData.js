@@ -1,12 +1,12 @@
-const Discord = require("discord.js");
+const { Message, MessageEmbed } = require("discord.js");
 const Client = require("./Client.js");
-const DMP = require("discord-music-player");
+const { Song } = require("discord-music-player");
 
-class QueueData {
+module.exports = class QueueData {
   #embedMessage;
 
   /**
-   * @param {Discord.Message} initialMessage
+   * @param {Message} initialMessage
    */
   constructor(initialMessage) {
     this.musicTextChannel = initialMessage.channel;
@@ -21,11 +21,11 @@ class QueueData {
   /**
    *
    * @param {Client} client
-   * @param {DMP.Song} song
+   * @param {Song} song
    */
   async updateNowPlaying(client, song) {
     //Create now playing embed
-    const nowPlayingEmbed = new Discord.MessageEmbed({
+    const nowPlayingEmbed = new MessageEmbed({
       title: "Now playing",
       description: `[${song.name}](${song.url})`,
       color: "DARK_BLUE",
@@ -57,7 +57,7 @@ class QueueData {
   }
 
   /**
-   * @param {Discord.Message} newEmbedMessage
+   * @param {Message} newEmbedMessage
    */
   setEmbedMessage(newEmbedMessage) {
     if (newEmbedMessage.embeds.length != 1) {
@@ -86,6 +86,4 @@ class QueueData {
     this.#embedMessage = newEmbedMessage;
     return;
   }
-}
-
-module.exports = QueueData;
+};

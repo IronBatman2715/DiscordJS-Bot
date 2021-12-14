@@ -1,11 +1,11 @@
-const Discord = require("discord.js");
+const { Message, Interaction } = require("discord.js");
 const Client = require("../structures/Client.js");
 const Command = require("../structures/Command.js");
 const isValidArg = require("./isValidArg.js");
 
 /**
  * @param {Command} command
- * @param {Discord.Message | Discord.Interaction} message
+ * @param {Message | Interaction} message
  * @param {string[]} args
  * @param {Client} client
  * @returns {boolean}

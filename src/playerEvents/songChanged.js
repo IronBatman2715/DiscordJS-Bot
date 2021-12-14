@@ -1,14 +1,13 @@
 const Client = require("../structures/Client.js");
 const PlayerEvent = require("../structures/PlayerEvent.js");
-const DMP = require("discord-music-player");
+const { Queue, Song } = require("discord-music-player");
 
 module.exports = new PlayerEvent(
-  "songChanged",
   /**
    * @param {Client} client
-   * @param {DMP.Queue} queue
-   * @param {DMP.Song} newSong
-   * @param {DMP.Song} oldSong
+   * @param {Queue} queue
+   * @param {Song} newSong
+   * @param {Song} oldSong
    */
   async (client, queue, newSong, oldSong) => {
     if (oldSong == newSong) {

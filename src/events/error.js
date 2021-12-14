@@ -1,5 +1,5 @@
-const Event = require("../structures/Event.js");
+const Event = require("../structures/Event");
 
-module.exports = new Event("error", (client, error) => {
+module.exports = new Event((client, error) => {
   console.log(`Error: ${error}!`);
 });

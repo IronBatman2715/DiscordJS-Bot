@@ -1,5 +1,5 @@
 const Command = require("../../structures/Command.js");
-const DMP = require("discord-music-player");
+const { RepeatMode } = require("discord-music-player");
 
 module.exports = new Command({
   name: "repeat",
@@ -35,24 +35,24 @@ module.exports = new Command({
       case "stop":
       case "off":
       case "none":
-        if (guildQueue.repeatMode == DMP.RepeatMode.DISABLED) {
+        if (guildQueue.repeatMode == RepeatMode.DISABLED) {
           return message.reply("Already set to do no repeats!");
         }
-        guildQueue.setRepeatMode(DMP.RepeatMode.DISABLED);
+        guildQueue.setRepeatMode(RepeatMode.DISABLED);
         return message.reply(
           "Neither the current song nor the queue will repeat now!"
         );
       case "song":
-        if (guildQueue.repeatMode == DMP.RepeatMode.SONG) {
+        if (guildQueue.repeatMode == RepeatMode.SONG) {
           return message.reply("Already set to repeat the current song!");
         }
-        guildQueue.setRepeatMode(DMP.RepeatMode.SONG);
+        guildQueue.setRepeatMode(RepeatMode.SONG);
         return message.reply("The current song will repeat now!");
       case "queue":
-        if (guildQueue.repeatMode == DMP.RepeatMode.QUEUE) {
+        if (guildQueue.repeatMode == RepeatMode.QUEUE) {
           return message.reply("Already set to repeat the queue!");
         }
-        guildQueue.setRepeatMode(DMP.RepeatMode.QUEUE);
+        guildQueue.setRepeatMode(RepeatMode.QUEUE);
         return message.reply("The queue will repeat now!");
 
       default:

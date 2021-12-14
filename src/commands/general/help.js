@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const snakeCase2Display = require("../../functions/snakeCase2Display.js");
 const Command = require("../../structures/Command.js");
 const fs = require("fs");
@@ -21,12 +21,12 @@ module.exports = new Command({
     const { prefix } = client.getGuildConfig(message.guildId);
 
     //Verify arguments
-    let pageName;
+    const pageName = args.length > 1 ? args[1].toLowerCase() : undefined;
     if (args.length == 2) {
-      pageName = client.commandTypes.find(
-        (type) => type == args[1].toLowerCase()
-      );
-      if (typeof pageName === "undefined" || pageName == "dev") {
+      if (
+        client.commands.filter((command) => command.type == pageName).length >=
+        1
+      ) {
         return await message.reply(
           `\`${args[1]}\` is not a valid command category!`
         );
@@ -35,7 +35,7 @@ module.exports = new Command({
       return await message.reply("Invalid number of arguments submitted!");
     }
 
-    const embed = new Discord.MessageEmbed({
+    const embed = new MessageEmbed({
       title: `${client.config.name} Command categories`,
       timestamp: message.createdTimestamp,
       color: "DARK_BLUE",

@@ -1,12 +1,11 @@
-const Discord = require("discord.js");
+const { Interaction } = require("discord.js");
 const Client = require("../structures/Client.js");
 const Event = require("../structures/Event.js");
 
 module.exports = new Event(
-  "interactionCreate",
   /**
    * @param {Client} client
-   * @param {Discord.Interaction} interaction
+   * @param {Interaction} interaction
    */
   async (client, interaction) => {
     /*if (interaction.isSelectMenu()) {

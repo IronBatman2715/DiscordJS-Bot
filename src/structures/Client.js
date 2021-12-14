@@ -2,10 +2,10 @@ const Discord = require("discord.js");
 const Command = require("./Command.js");
 const Event = require("./Event.js");
 const PlayerEvent = require("./PlayerEvent.js");
-const DMP = require("discord-music-player");
+const { Player } = require("discord-music-player");
 const fs = require("fs");
 
-class Client extends Discord.Client {
+module.exports = class Client extends Discord.Client {
   constructor() {
     console.log("*** DISCORD JS BOT: INITIALIZATION ***");
 
@@ -14,32 +14,28 @@ class Client extends Discord.Client {
       allowedMentions: { repliedUser: false },
     });
 
-    /**
-     * @type {Discord.Collection<string, Command>}
-     */
-    this.commands = new Discord.Collection();
-
     this.config = require("../data/config.json"); //universal bot configs
-
-    // Discord music player instance
-    /**
-     * @type {DMP.Player}
-     */
-    this.player = new DMP.Player(this, {
-      leaveOnEmpty: false,
-      deafenOnJoin: true,
-    });
 
     console.log(`Loading ${this.config.name} v${this.config.version}`);
   }
 
   start(token) {
-    //Register commands
+    this.registerCommands();
+    this.registerEvents();
+    this.registerPlayerEvents();
+
+    this.login(token);
+    console.log("*** DISCORD JS BOT: INITIALIZATION DONE ***");
+  }
+
+  registerCommands() {
     console.log("Commands:");
-    this.commandTypes = [];
+    /**
+     * @type {Discord.Collection<string, Command>}
+     */
+    this.commands = new Discord.Collection();
     fs.readdirSync("./src/commands").forEach((dir) => {
       //Register each folder of commands
-      this.commandTypes.push(dir.toString().toLowerCase());
       console.log(`\t${dir}`);
       fs.readdirSync(`./src/commands/${dir}`)
         .filter((file) => file.endsWith(".js"))
@@ -48,44 +44,50 @@ class Client extends Discord.Client {
            * @type {Command}
            */
           const command = require(`../commands/${dir}/${file}`);
-          command.type = dir.toString();
+          command.type = dir.toString().toLowerCase();
           this.commands.set(command.name, command);
           console.log(`\t\t${command.name}`);
         });
     });
+  }
 
-    //Register discord events
+  registerEvents() {
     console.log("Events:");
     fs.readdirSync("./src/events")
       .filter((file) => file.endsWith(".js"))
       .forEach((file) => {
-        /**
-         * @type {Event}
-         */
+        const eventName = file.slice(0, file.length - 3);
+        /** @type {Event} */
         const event = require(`../events/${file}`);
-        this.on(event.name, event.runFunction.bind(null, this));
-        console.log(`\t${event.name}`);
-      });
 
-    //Register discord music player events
+        this.on(eventName, event.runFunction.bind(null, this));
+        console.log(`\t${eventName}`);
+      });
+  }
+
+  registerPlayerEvents() {
     console.log("Player Events:");
+    /**
+     * @type {Player}
+     */
+    this.player = new Player(this, {
+      leaveOnEmpty: false,
+      deafenOnJoin: true,
+    });
     fs.readdirSync("./src/playerEvents")
       .filter((file) => file.endsWith(".js"))
       .forEach((file) => {
+        const playerEventName = file.slice(0, file.length - 3);
         /**
          * @type {PlayerEvent}
          */
         const playerEvent = require(`../playerEvents/${file}`);
         this.player.on(
-          playerEvent.name,
+          playerEventName,
           playerEvent.runFunction.bind(null, this)
         );
-        console.log(`\t${playerEvent.name}`);
+        console.log(`\t${playerEventName}`);
       });
-
-    console.log("*** DISCORD JS BOT: INITIALIZATION DONE ***");
-
-    this.login(token);
   }
 
   /**
@@ -124,6 +126,4 @@ class Client extends Discord.Client {
         return require(`../data/guilds/default.json`);
     }
   }
-}
-
-module.exports = Client;
+};

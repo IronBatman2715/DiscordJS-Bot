@@ -1,4 +1,4 @@
-const Discord = require("discord.js");
+const { MessageEmbed } = require("discord.js");
 const Command = require("../../structures/Command.js");
 
 module.exports = new Command({
@@ -7,7 +7,7 @@ module.exports = new Command({
   permissions: ["ADMINISTRATOR"],
 
   async run(message, args, client) {
-    let embed = new Discord.MessageEmbed({
+    let embed = new MessageEmbed({
       title: `Test embed`,
       description: `This is a cool test embed!`,
       url: "https://discord.js.org/#/docs/main/stable/general/welcome",

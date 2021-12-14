@@ -1,6 +1,6 @@
-const Discord = require("discord.js");
+const { MessageEmbed } = require("discord.js");
+const { RepeatMode } = require("discord-music-player");
 const Command = require("../../structures/Command.js");
-const DMP = require("discord-music-player");
 
 module.exports = new Command({
   name: "queue",
@@ -41,20 +41,20 @@ module.exports = new Command({
 
     let repeatModeStr;
     switch (guildQueue.repeatMode) {
-      case DMP.RepeatMode.SONG:
+      case RepeatMode.SONG:
         repeatModeStr = "Song";
         break;
-      case DMP.RepeatMode.QUEUE:
+      case RepeatMode.QUEUE:
         repeatModeStr = "Queue";
         break;
 
       default:
-        guildQueue.setRepeatMode(DMP.RepeatMode.DISABLED);
-      case DMP.RepeatMode.DISABLED:
+        guildQueue.setRepeatMode(RepeatMode.DISABLED);
+      case RepeatMode.DISABLED:
         repeatModeStr = "None";
         break;
     }
-    const helpEmbed = new Discord.MessageEmbed({
+    const helpEmbed = new MessageEmbed({
       title: `Music Queue (${guildQueue.songs.length} song${
         guildQueue.songs.length == 1 ? "" : "s"
       }) [Repeat mode: ${repeatModeStr}]`,
