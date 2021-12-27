@@ -1,14 +1,14 @@
-const { Message, TextChannel } = require("discord.js");
+const { Message, CommandInteraction } = require("discord.js");
 
 /**
- * @param {TextChannel} channel
+ * @param {CommandInteraction} interaction
  * @param {string} text
  * @param {boolean} showCountdown [default: true]
  * @param {Number} durationInSeconds [default: 10]
  * @param {Number} countdownIntervalInSeconds [default: 2]
  */
 module.exports = async (
-  channel,
+  interaction,
   text,
   showCountdown = true,
   durationInSeconds = 10,
@@ -28,11 +28,15 @@ module.exports = async (
     );
   }
 
-  //console.log("Ticking tempMessage");
-  if (showCountdown) {
-    //Show countdown to when message will delete itself
-    let newText = text + `...`;
-    channel.send(newText + durationInSeconds.toString()).then((message) => {
+  try {
+    //console.log("Ticking tempMessage");
+    if (showCountdown) {
+      //Show countdown to when message will delete itself
+      let newText = text + `...`;
+      const message = await interaction.followUp({
+        content: newText + durationInSeconds.toString(),
+      });
+
       setTimeout(() => {
         countdown(
           durationInSeconds - countdownIntervalInSeconds,
@@ -41,16 +45,18 @@ module.exports = async (
           newText
         );
       }, 1000 * countdownIntervalInSeconds);
-    });
-  } else {
-    //No visible countdown to when message will delete itself
-    channel.send(text).then((message) => {
+    } else {
+      //No visible countdown to when message will delete itself
+      const message = await interaction.followUp({ content: text });
+
       setTimeout(() => {
         message.delete();
       }, 1000 * durationInSeconds);
-    });
+    }
+    //console.log("Done ticking tempMessage!");
+  } catch (error) {
+    console.error(error);
   }
-  //console.log("Done ticking tempMessage!");
 };
 
 /**
@@ -59,22 +65,20 @@ module.exports = async (
  * @param {Message} tempMessage
  * @param {string} text
  */
-function countdown(t, countdownIntervalInSeconds, tempMessage, newText) {
-  tempMessage.edit(newText + t.toString()).then((tempMsg) => {
-    if (t <= 0) {
-      tempMsg.delete().then(() => {
-        return;
-      });
-    } else {
-      setTimeout(() => {
-        countdown(
-          t - countdownIntervalInSeconds,
-          countdownIntervalInSeconds,
-          tempMsg,
-          newText
-        );
-      }, 1000 * countdownIntervalInSeconds);
-    }
+async function countdown(t, countdownIntervalInSeconds, tempMessage, newText) {
+  const tempMsg = await tempMessage.edit({ content: newText + t.toString() });
+
+  if (t <= 0) {
+    await tempMsg.delete();
     return;
-  });
+  } else {
+    setTimeout(() => {
+      countdown(
+        t - countdownIntervalInSeconds,
+        countdownIntervalInSeconds,
+        tempMsg,
+        newText
+      );
+    }, 1000 * countdownIntervalInSeconds);
+  }
 }

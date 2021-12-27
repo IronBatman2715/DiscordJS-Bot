@@ -1,17 +1,19 @@
 const { MessageEmbed } = require("discord.js");
 const Command = require("../../structures/Command.js");
 
-module.exports = new Command({
-  name: "embed",
-  description: "Shows a test embed.",
-  permissions: ["ADMINISTRATOR"],
+module.exports = new Command(
+  "dev",
+  {
+    name: "embed",
+    description: "DEV ONLY: Shows a test embed.",
+  },
 
-  async run(message, args, client) {
-    let embed = new MessageEmbed({
+  async (client, interaction, args) => {
+    const embed = client.genEmbed({
       title: `Test embed`,
       description: `This is a cool test embed!`,
       url: "https://discord.js.org/#/docs/main/stable/general/welcome",
-      timestamp: message.createdTimestamp,
+      timestamp: interaction.createdTimestamp,
       color: "DARK_BLUE",
       fields: [
         {
@@ -21,9 +23,9 @@ module.exports = new Command({
         },
       ],
       author: {
-        name: message.author.username,
+        name: interaction.member.user.username,
         url: "https://sites.google.com/view/z27",
-        iconURL: message.author.avatarURL({ dynamic: true }),
+        iconURL: interaction.member.avatarURL({ dynamic: true }),
       },
       thumbnail: {
         url: "https://www.seoptimer.com/blog/wp-content/uploads/2018/09/image22.png",
@@ -32,10 +34,10 @@ module.exports = new Command({
         url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/U%2B2160.svg/1200px-U%2B2160.svg.png",
       },
       footer: {
-        text: `${client.config.name} v${client.config.version}`,
+        text: client.config.name,
       },
     });
 
-    return await message.reply({ embeds: [embed] });
-  },
-});
+    return await interaction.followUp({ embeds: [embed] });
+  }
+);

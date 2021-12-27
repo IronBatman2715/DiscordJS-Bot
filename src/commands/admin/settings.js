@@ -1,101 +1,174 @@
-const { Message, MessageEmbed } = require("discord.js");
+const { CommandInteraction, EmbedFieldData } = require("discord.js");
 const Client = require("../../structures/Client.js");
 const Command = require("../../structures/Command.js");
-const fs = require("fs");
-
-const settings = [
-  {
-    name: "prefix",
-    type: "string",
-    description:
-      'The command prefix. When at the beginning of a message, this tells the bot to scan the message for a command and (if applicable) it\'s arguments. [default: "!"]',
-  },
-  {
-    name: "greetings",
-    type: "string[]",
-    description: `A list of greetings that the bot can give. Ex: upon call of the \`hello\` command.`,
-  },
-  {
-    name: "maxMessagesCleared",
-    type: "integer",
-    range: [1, 100],
-    description:
-      "The maximum number of messages that the `clear` command can delete in one command call (maximum setting of `100`). [default: `100`]",
-  },
-  {
-    name: "designatedMusicChannelIds",
-    type: "string[]",
-    description:
-      "A list of text channel ids. If one or more are specified, ALL music commands MUST be entered one of these text channels. [default: `[]`]",
-  },
-];
-
-module.exports = new Command({
-  name: "settings",
-  extraArguments: [
-    {
-      name: "setting to alter",
-      type: "string",
-      required: false,
-    },
-    {
-      name: "new value",
-      type: "any",
-      required: true,
-    },
-  ],
-  description: "Change/view guild settings.",
-  permissions: ["ADMINISTRATOR"],
-
-  /**
-   * @param {Message} message
-   * @param {string[]} args
-   * @param {Client} client
-   * @returns
-   */
-  async run(message, args, client) {
-    console.log("Settings command:");
-
-    //User wants to see current settings
-    if (args.length == 1) {
-      return displayCurrentSettings(message, client);
-    }
-
-    //User entered a setting to change
-    if (args.length == 3) {
-      return changeSetting(message, client, args[1], args[2]);
-    }
-  },
-});
+const {
+  ApplicationCommandOptionType,
+  ChannelType,
+} = require("discord-api-types/v9");
+const { RepeatMode } = require("discord-music-player");
 
 /**
- * @param {string} settingName
- * @returns {boolean}
+ * @typedef {{name: string, type: string, range?: number[], description: string}} SettingsInfo
+ * @type {SettingsInfo[]}
  */
-async function isValidSettingName(settingName) {
-  const defaultGuildConfig = require("../../resources/data/guilds/default.json");
+const settingsInfo = require("../../resources/data/guilds/settingsInfo.js");
 
-  if (defaultGuildConfig.hasOwnProperty(settingName)) {
-    return true;
-  } else {
-    await message.reply(`Invalid setting name!`);
-    return false;
+module.exports = new Command(
+  "admin",
+  {
+    name: "settings",
+    description: "ADMIN ONLY: Change/view guild settings.",
+    defaultPermission: false,
+    options: [
+      {
+        name: "display",
+        description: "Show current settings for this guild/server.",
+        type: ApplicationCommandOptionType.Subcommand,
+      },
+      {
+        name: "reset",
+        description: "Resets this guild/server's settings to default!",
+        type: ApplicationCommandOptionType.Subcommand,
+      },
+      {
+        name: settingsInfo[0].name.toLowerCase(), //greetings
+        description: settingsInfo[0].description,
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          {
+            name: "value",
+            description: `New value to assign to ${settingsInfo[0].name.toLowerCase()}.`,
+            type: ApplicationCommandOptionType.String,
+            required: true,
+          },
+        ],
+      },
+      {
+        name: settingsInfo[1].name.toLowerCase(), //maxMessagesCleared
+        description: settingsInfo[1].description,
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          {
+            name: "quantity",
+            description: `New value to assign to ${settingsInfo[1].name.toLowerCase()}.`,
+            type: ApplicationCommandOptionType.Integer,
+            required: true,
+          },
+        ],
+      },
+
+      {
+        name: settingsInfo[2].name.toLowerCase(), //musicChannel
+        description: settingsInfo[2].description,
+        type: ApplicationCommandOptionType.SubcommandGroup,
+        options: [
+          {
+            name: "add",
+            description: "Overwrite/enable a designated music text channel.",
+            type: ApplicationCommandOptionType.Subcommand,
+            options: [
+              {
+                name: "textchannel",
+                description: "The designated music text channel.",
+                type: ApplicationCommandOptionType.Channel,
+                channelTypes: [ChannelType.GuildText],
+                required: true,
+              },
+            ],
+          },
+          {
+            name: "disable",
+            description:
+              "Allow any text channel to be used for music commands.",
+            type: ApplicationCommandOptionType.Subcommand,
+          },
+        ],
+      },
+
+      {
+        name: settingsInfo[3].name.toLowerCase(), //defaultRepeatMode
+        description: settingsInfo[3].description,
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          {
+            name: "repeatmode",
+            description: "New repeat mode to set.",
+            type: ApplicationCommandOptionType.Integer,
+            required: true,
+            choices: [
+              {
+                name: "DISABLED",
+                value: RepeatMode.DISABLED,
+              },
+              {
+                name: "SONG",
+                value: RepeatMode.SONG,
+              },
+              {
+                name: "QUEUE",
+                value: RepeatMode.QUEUE,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  async (client, interaction, args) => {
+    if (args.length < 2) {
+      switch (args[0]) {
+        //User wants to see current settings
+        case "display": {
+          return await displayCurrentSettings(interaction, client);
+        }
+
+        //User wants to reset settings
+        case "reset": {
+          return await interaction.followUp({
+            content: "Subcommand is not working currently (WIP)!",
+          });
+          return await resetSettings(interaction, client);
+        }
+
+        default: {
+          return await interaction.followUp({
+            content: "Error is settings! Tell dev please!",
+          });
+        }
+      }
+    }
+
+    //If args[0] (AKA settingsOption) is possibly a 3 argument subcommand
+    if (args[0] == "musicchannel") {
+      const [settingsOption, action, value] = args;
+
+      if (args.length == 2 || value == undefined || action == "disable") {
+        return await changeSetting(interaction, client, settingsOption, "");
+      }
+
+      //User entered a new value for this 3 argument setting
+      return await changeSetting(interaction, client, settingsOption, value);
+    }
+
+    const [settingsOption, value] = args;
+    //User entered a new value for this 2 argument setting
+    return await changeSetting(interaction, client, settingsOption, value);
   }
-}
+);
 
 /**
- * @param {Message} message
+ * @param {CommandInteraction} interaction
  * @param {Client} client
  */
-async function displayCurrentSettings(message, client) {
-  const currentGuildConfig = client.getGuildConfig(message.guildId);
+async function displayCurrentSettings(interaction, client) {
+  const currentGuildConfig = client.getGuildConfig(interaction.guildId);
 
+  /** @type {EmbedFieldData[]} */
   let settingsFieldArr = [];
   for (const propt in currentGuildConfig) {
-    //Check if is a valid property
-    if (!isValidSettingName(propt)) return;
-
     let currentValue = currentGuildConfig[propt];
+
     if (Array.isArray(currentGuildConfig[propt])) {
       const array = currentGuildConfig[propt];
       currentValue = "[ ";
@@ -108,94 +181,118 @@ async function displayCurrentSettings(message, client) {
       currentValue = currentValue + " ]";
     }
 
-    let setting = settings.filter((setting) => setting.name == propt)[0];
+    const [setting] = settingsInfo.filter((setting) => setting.name == propt);
+    /**
+     * @typedef {{name: string, type: string, value: number | string, range?: number[]}} ArgData
+     * @type {ArgData}
+     */
+    const argData = {
+      name: propt,
+      type: "",
+      value: currentValue,
+    };
+
+    const getSettingDisplayValue = require("../../functions/getSettingDisplayValue.js");
 
     settingsFieldArr.push({
-      name: `\`${propt}\`: \`${currentValue}\``,
+      name: `\`${propt}\`: \`${await getSettingDisplayValue(
+        argData,
+        interaction.guild
+      )}\``,
       value: setting.description,
       inline: false,
     });
   }
 
-  const currentSettingsEmbed = new MessageEmbed({
-    title: `${message.guild.name} [id: \`${message.guildId}\`] Server-wide Settings`,
-    description: `*Refer to* \`${currentGuildConfig.prefix}help\` *to change a setting.*`,
-    timestamp: message.createdTimestamp,
-    color: "DARK_BLUE",
+  const currentSettingsEmbed = client.genEmbed({
+    title: `${interaction.guild.name} [id: \`${interaction.guildId}\`] Server-wide Settings`,
     fields: settingsFieldArr,
-    footer: {
-      text: `${client.config.name} v${client.config.version}`,
+    thumbnail: {
+      url: "attachment://settings.png",
     },
-  }).setThumbnail("attachment://settings.png");
+  });
 
-  return await message.reply({
+  return await interaction.followUp({
     embeds: [currentSettingsEmbed],
     files: ["./src/resources/assets/icons/settings.png"],
   });
 }
 
 /**
- * @param {Message} message
+ * @param {CommandInteraction} interaction
+ * @param {Client} client
+ */
+async function resetSettings(interaction, client) {
+  try {
+    const fs = require("fs");
+    fs.copyFileSync(
+      "./src/resources/data/guilds/default.json",
+      `./src/resources/data/guilds/${interaction.guildId}.json`
+    );
+
+    return interaction.followUp({
+      content: `Reset guild/server settings!`,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return interaction.followUp({
+      content: `FAILED to reset guild/server settings!`,
+    });
+  }
+}
+
+/**
+ * @param {CommandInteraction} interaction
  * @param {Client} client
  * @param {string} settingName
- * @param {string} newSettingValue
+ * @param {String | Number} newSettingValue
  */
-async function changeSetting(message, client, settingName, newSettingValue) {
-  //Check if is a valid property
-  if (!isValidSettingName(settingName)) return;
+async function changeSetting(
+  interaction,
+  client,
+  settingName,
+  newSettingValue
+) {
+  const [setting] = settingsInfo.filter(
+    (setting) => setting.name.toLowerCase() == settingName
+  );
 
-  const setting = settings.filter((setting) => setting.name == settingName)[0];
+  const currentGuildConfig = client.getGuildConfig(interaction.guildId);
 
-  const currentGuildConfig = client.getGuildConfig(message.guildId);
-
+  /**
+   * @typedef {{name: string, type: string, value: number | string, range?: number[]}} ArgData
+   * @type {ArgData}
+   */
   const newValueArg = {
-    name: settingName,
+    name: setting.name,
     type: setting.type,
-    required: true,
     value: newSettingValue,
     range: setting.hasOwnProperty("range") ? setting.range : [],
   };
   console.log(`newValueArg: \n`, newValueArg, "\n");
 
-  //DONT ALLOW CHANING ARRAY SETTINGS FOR NOW
+  //DONT ALLOW CHANGING ARRAY SETTINGS FOR NOW
   if (newValueArg.type.endsWith("[]")) {
-    return await message.reply(
-      `Currently not supporting changing settings with array data!`
-    );
+    return await interaction.followUp({
+      content: `Currently not supporting changing settings with array data!`,
+    });
   }
 
-  const isValidArg = require("../../functions/isValidArg.js");
-  if (!isValidArg(newValueArg)) {
-    return await message.reply(
-      `New value is an invalid type (string, integer, etc.)!`
-    );
-  }
-
-  switch (newValueArg.name) {
-    case "prefix": {
-      //If length is anything other than 1
-      if (newValueArg.value.length != 1) {
-        return await message.reply(
-          `Prefix must be exactly one character long!`
-        );
-      }
-
-      //If is a letter
-      if (newValueArg.value.match(/[a-z]/i)) {
-        return await message.reply(`Cannot make prefix a letter!`);
-      }
-
-      //Check if desired prefix is in blacklist
-      const prefixBlacklist = ["/"];
-      if (prefixBlacklist.indexOf(newValueArg.value) > -1) {
-        return await message.reply(`Prefix can NOT be ${newValueArg.value}!`);
-      }
-      break;
+  //If entry is a number, check if it is in allowed range
+  if (
+    (typeof newValueArg.value).toLowerCase() == "number" &&
+    newValueArg.range != []
+  ) {
+    console.log("Checking if number is in range");
+    const isInRange = require("../../functions/isInRange.js");
+    if (
+      !isInRange(newValueArg.value, newValueArg.range[0], newValueArg.range[1])
+    ) {
+      return await interaction.followUp({
+        content: `Entered value is out of allowed range: [${newValueArg.range[0]}, ${newValueArg.range[1]}]!`,
+      });
     }
-
-    default:
-      console.log("This settings does not have a special argument check.");
-      break;
   }
 
   let newGuildConfig = currentGuildConfig;
@@ -204,22 +301,27 @@ async function changeSetting(message, client, settingName, newSettingValue) {
       ? Number(newValueArg.value)
       : newValueArg.value;
   console.log(
-    `New guild config [GuildId: ${message.guildId}]\n`,
+    `New guild config [GuildId: ${interaction.guildId}]\n`,
     newGuildConfig,
     "\n"
   );
 
+  const fs = require("fs");
   fs.writeFileSync(
-    `./src/resources/data/guilds/${message.guildId}.json`,
+    `./src/resources/data/guilds/${interaction.guildId}.json`,
     JSON.stringify(newGuildConfig, null, "\t")
   );
   console.log(
-    `Saved new guild config [GuildId: ${message.guildId}]\n`,
-    client.getGuildConfig(message.guildId),
+    `Saved new guild config [GuildId: ${interaction.guildId}]\n`,
+    client.getGuildConfig(interaction.guildId),
     "\n"
   );
 
-  return await message.reply(
-    `Changed \`${newValueArg.name}\` to \`${newValueArg.value}\``
-  );
+  const getSettingDisplayValue = require("../../functions/getSettingDisplayValue.js");
+  return await interaction.followUp({
+    content: `Changed \`${newValueArg.name.toLowerCase()}\` to \`${await getSettingDisplayValue(
+      newValueArg,
+      interaction.guild
+    )}\``,
+  });
 }

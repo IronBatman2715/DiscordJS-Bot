@@ -1,31 +1,40 @@
-const { MessageActionRow, MessageSelectMenu } = require("discord.js");
+const {
+  MessageActionRow,
+  MessageSelectMenu,
+  MessageSelectOption,
+} = require("discord.js");
 const Command = require("../../structures/Command.js");
+const isInRange = require("../../functions/isInRange.js");
+const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 
-module.exports = new Command({
-  name: "menu",
-  extraArguments: [
-    {
-      name: "number of options",
-      type: "integer",
-      required: true,
-      range: [1, Number.MAX_SAFE_INTEGER],
-    },
-  ],
-  description: "Shows a test menu.",
-  permissions: ["ADMINISTRATOR"],
+module.exports = new Command(
+  "dev",
+  {
+    name: "menu",
+    description: "DEV ONLY: Shows a test menu.",
+    options: [
+      {
+        name: "numberOfOptions".toLowerCase(),
+        description: "Number of options to generate.",
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+      },
+    ],
+  },
 
-  async run(message, args, client) {
-    //Argument check
-    if (args.length != 2) {
-      return await message.reply("Invalid number of arguments entered!");
+  async (client, interaction, args) => {
+    const [numOfOptions] = args;
+
+    //Check if is in allowed range
+    if (!isInRange(numOfOptions)) {
+      return await interaction.followUp({
+        content: `Entered value is out of allowed range: [1, ${Number.MAX_SAFE_INTEGER}]!`,
+      });
     }
-    let numToGen = parseInt(args[1]);
-    if (!Number.isInteger(numToGen)) {
-      return await message.reply("Invalid number of options requested!");
-    }
 
+    /** @type {MessageSelectOption[]} */
     let options = [];
-    for (let i = 0; i < numToGen; i++) {
+    for (let i = 0; i < numOfOptions; i++) {
       let displayNum = i + 1;
       options[i] = {
         label: `Option ${displayNum} label`,
@@ -35,18 +44,22 @@ module.exports = new Command({
       };
     }
 
-    const row = new MessageActionRow().addComponents(
-      new MessageSelectMenu()
-        .setCustomId("test-select-menu-id")
-        .setPlaceholder("Choose something")
-        .setMinValues(1)
-        .setMaxValues(1)
-        .addOptions(options)
-    );
+    const row = new MessageActionRow({
+      components: [
+        new MessageSelectMenu({
+          custom_id: "test-select-menu-id",
+          placeholder: "Choose something",
+          minValues: 1,
+          maxValues: 1,
+          options: options,
+        }),
+      ],
+      type: "SELECT_MENU",
+    });
 
-    await message.reply({
+    await interaction.followUp({
       content: "Select something below!",
       components: [row],
     });
-  },
-});
+  }
+);

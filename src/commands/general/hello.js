@@ -1,15 +1,17 @@
 const Command = require("../../structures/Command.js");
 
-module.exports = new Command({
-  name: "hello",
-  aliases: ["greetings"],
-  description: "Replies hello!",
-
-  async run(message, args, client) {
-    const { greetings } = client.getGuildConfig(message.guildId);
-
-    let index = Math.floor(Math.random() * greetings.length);
-
-    await message.reply(greetings[index]);
+module.exports = new Command(
+  "general",
+  {
+    name: "hello",
+    description: "Replies with a greeting!",
   },
-});
+
+  async (client, interaction, args) => {
+    const { greetings } = client.getGuildConfig(interaction.guildId);
+
+    const index = Math.floor(Math.random() * greetings.length);
+
+    return await interaction.followUp({ content: greetings[index] });
+  }
+);

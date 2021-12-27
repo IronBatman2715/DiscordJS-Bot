@@ -1,59 +1,62 @@
 const Command = require("../../structures/Command.js");
 const tempMessage = require("../../functions/tempMessage.js");
+const isInRange = require("../../functions/isInRange.js");
+const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 
-module.exports = new Command({
-  name: "remove",
-  extraArguments: [
-    {
-      name: "number in queue",
-      type: "integer",
-      required: true,
-      range: [1, Number.MAX_SAFE_INTEGER],
-    },
-  ],
-  description: "Remove song from music queue.",
+module.exports = new Command(
+  "music",
+  {
+    name: "remove",
+    description: "Remove a song from music queue.",
+    options: [
+      {
+        name: "queuenumber",
+        description: "Number of song in queue.",
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+      },
+    ],
+  },
 
-  async run(message, args, client) {
-    const { prefix } = client.getGuildConfig(message.guildId);
+  async (client, interaction, args) => {
+    //Add ability to remove multiple eventually..?
 
     //Get queue
     let guildQueue;
-    if (client.player.hasQueue(message.guild.id)) {
-      guildQueue = client.player.getQueue(message.guild.id);
+    if (client.player.hasQueue(interaction.guildId)) {
+      guildQueue = client.player.getQueue(interaction.guildId);
     } else {
-      return message.reply("A queue has not been started!");
+      return interaction.followUp({ content: "A queue has not been started!" });
     }
 
-    //Argument(s) check
-    if (args.length > 1) {
-      return message.reply("Invalid entry! Refer to the help entry on queue!");
+    if (args.length != 1) {
+      return interaction.followUp({
+        content:
+          "Must enter the number of the song you want to remove! Refer to the help entry on remove!",
+      });
     }
 
-    //remove.js: Remove a song from the queue (add ability to remove multiple eventually..?)
-    if (args.length != 2) {
-      return message.reply(
-        "Must enter the number of the song you want to remove! Refer to the help entry on remove!"
-      );
+    const [index] = args;
+    if (!isInRange(index, 1, guildQueue.songs.length)) {
+      return interaction.followUp({
+        content: `Must enter the song's place in the queue! (Ex: Remove 3rd song in queue: "/remove 3")`,
+      });
     }
 
-    let index = parseInt(args[1]);
-    if (isNaN(index)) {
-      return message.reply(
-        `Must enter the song's place in the queue! (Ex: Remove 3rd song in queue: "${prefix}remove 3")`
-      );
-    }
-
-    console.log(`Input removal index: ${index}`);
+    console.log("Input removal index: ", index);
     index -= 1; //convert from place in queue to array index
-    console.log(`Array-wise removal index: ${index}`);
+    console.log("Array-wise removal index: ", index);
     if (index < 0 || index > guildQueue.songs.length) {
-      return message.reply("Song number entered does not exist in this queue!");
+      return interaction.followUp({
+        content: "Song number entered does not exist in this queue!",
+      });
     }
 
     const removedSong = guildQueue.songs[index];
     guildQueue.remove(index);
     index += 1; //revert from array index to place in queue
 
+    /** @type {string} */
     let ordinalSuffix;
     switch (index) {
       case 1:
@@ -71,8 +74,8 @@ module.exports = new Command({
         break;
     }
     tempMessage(
-      message.channel,
+      interaction.channel,
       `Removed the ${index}${ordinalSuffix} song from the queue! (${removedSong.name})`
     );
-  },
-});
+  }
+);

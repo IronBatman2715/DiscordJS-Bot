@@ -1,20 +1,24 @@
 const Command = require("../../structures/Command.js");
 
-module.exports = new Command({
-  name: "skip",
-  description: "Skip current song.",
+module.exports = new Command(
+  "music",
+  {
+    name: "skip",
+    description: "Skip current song.",
+  },
 
-  async run(message, args, client) {
+  async (client, interaction, args) => {
     let guildQueue;
-    if (client.player.hasQueue(message.guild.id)) {
-      guildQueue = client.player.getQueue(message.guild.id);
+    if (client.player.hasQueue(interaction.guildId)) {
+      guildQueue = client.player.getQueue(interaction.guildId);
     } else {
-      return message.reply(
-        "Cannot skip a song in a queue has not been started!"
-      );
+      return interaction.followUp({
+        content: "Cannot skip a song in a queue has not been started!",
+      });
     }
 
     guildQueue.skip();
-    message.react("👌");
-  },
-});
+
+    await interaction.deleteReply();
+  }
+);

@@ -1,31 +1,32 @@
-const { MessageEmbed } = require("discord.js");
 const { RepeatMode } = require("discord-music-player");
 const Command = require("../../structures/Command.js");
 
-module.exports = new Command({
-  name: "queue",
-  aliases: ["q"],
-  description: "Get music queue.",
+module.exports = new Command(
+  "music",
+  {
+    name: "queue",
+    description: "Display music queue.",
+  },
 
-  async run(message, args, client) {
+  async (client, interaction, args) => {
     //Get queue
     let guildQueue;
-    if (client.player.hasQueue(message.guild.id)) {
-      guildQueue = client.player.getQueue(message.guild.id);
+    if (client.player.hasQueue(interaction.guildId)) {
+      guildQueue = client.player.getQueue(interaction.guildId);
     } else {
-      return message.reply("A queue has not been started!");
+      return interaction.followUp({ content: "A queue has not been started!" });
     }
 
     //Argument(s) check
     if (args.length > 1) {
-      return message.reply(
-        `Invalid entry! Refer to the help entry on ${this.name}!`
-      );
+      return interaction.followUp({
+        content: `Invalid entry! Refer to the help entry on ${this.name}!`,
+      });
     }
 
     //Display queue
     if (guildQueue.songs.length == 0) {
-      return message.reply("No songs in queue!");
+      return interaction.followUp({ content: "No songs in queue!" });
     }
 
     let queueFieldArr = [];
@@ -51,24 +52,23 @@ module.exports = new Command({
       default:
         guildQueue.setRepeatMode(RepeatMode.DISABLED);
       case RepeatMode.DISABLED:
-        repeatModeStr = "None";
+        repeatModeStr = "Disabled";
         break;
     }
-    const helpEmbed = new MessageEmbed({
+
+    const queueEmbed = client.genEmbed({
       title: `Music Queue (${guildQueue.songs.length} song${
         guildQueue.songs.length == 1 ? "" : "s"
       }) [Repeat mode: ${repeatModeStr}]`,
-      timestamp: message.createdTimestamp,
-      color: "DARK_BLUE",
       fields: queueFieldArr,
       thumbnail: {
-        url: "https://icons.iconarchive.com/icons/blackvariant/button-ui-system-folders-drives/1024/Music-icon.png",
-      },
-      footer: {
-        text: `${client.config.name} v${client.config.version}`,
+        url: "attachment://music.png",
       },
     });
 
-    return await message.reply({ embeds: [helpEmbed] });
-  },
-});
+    return await interaction.followUp({
+      embeds: [queueEmbed],
+      files: ["./src/resources/assets/icons/music.png"],
+    });
+  }
+);

@@ -1,22 +1,24 @@
 const Command = require("../../structures/Command.js");
 
-module.exports = new Command({
-  name: "resume",
-  description: "Resume paused music.",
+module.exports = new Command(
+  "music",
+  {
+    name: "resume",
+    description: "Resume paused music.",
+  },
 
-  async run(message, args, client) {
-    const { prefix } = client.getGuildConfig(message.guildId);
-
+  async (client, interaction, args) => {
     let guildQueue;
-    if (client.player.hasQueue(message.guild.id)) {
-      guildQueue = client.player.getQueue(message.guild.id);
+    if (client.player.hasQueue(interaction.guildId)) {
+      guildQueue = client.player.getQueue(interaction.guildId);
     } else {
-      return message.reply(
-        `The queue is empty! Add a song or playlist using "${prefix}play"`
-      );
+      return interaction.followUp({
+        content: `The queue is empty! Add a song or playlist using "${prefix}play"`,
+      });
     }
 
     guildQueue.setPaused(false);
-    message.react("👌");
-  },
-});
+
+    await interaction.deleteReply();
+  }
+);

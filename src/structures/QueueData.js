@@ -1,20 +1,21 @@
-const { Message, MessageEmbed } = require("discord.js");
+const { CommandInteraction, Message } = require("discord.js");
 const Client = require("./Client.js");
 const { Song } = require("discord-music-player");
 
 module.exports = class QueueData {
+  /** @type {Message} */
   #embedMessage;
 
   /**
-   * @param {Message} initialMessage
+   * @param {CommandInteraction} initialInteraction
    */
-  constructor(initialMessage) {
-    this.musicTextChannel = initialMessage.channel;
-    this.initialMessage = initialMessage;
-    this.latestMessage = initialMessage;
+  constructor(initialInteraction) {
+    this.musicTextChannel = initialInteraction.channel;
+    this.initialInteraction = initialInteraction;
+    this.latestInteraction = initialInteraction;
   }
 
-  getEmbedMessage() {
+  async getEmbedMessage() {
     return this.#embedMessage;
   }
 
@@ -25,38 +26,26 @@ module.exports = class QueueData {
    */
   async updateNowPlaying(client, song) {
     //Create now playing embed
-    const nowPlayingEmbed = new MessageEmbed({
+    const nowPlayingEmbed = client.genEmbed({
       title: "Now playing",
       description: `[${song.name}](${song.url})`,
-      color: "DARK_BLUE",
       author: {
         name: song.requestedBy.username,
         iconURL: song.requestedBy.avatarURL({ dynamic: true }),
       },
-      footer: {
-        text: `${client.config.name} v${client.config.version}`,
+      thumbnail: {
+        url: "attachment://music.png",
       },
-    }).setThumbnail("attachment://music.png");
+    });
 
     try {
-      //Send/upadate and save embed as message
-      this.setEmbedMessage(
-        await this.musicTextChannel.send({
-          embeds: [nowPlayingEmbed],
-          files: ["./src/resources/assets/icons/music.png"],
-        })
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  }
+      //Send/update and save embed as message
+      const newEmbedMessage = await this.latestInteraction.followUp({
+        embeds: [nowPlayingEmbed],
+        files: ["./src/resources/assets/icons/music.png"],
+      });
 
-  async deleteEmbedMessage() {
-    try {
-      if (typeof this.#embedMessage !== "undefined") {
-        return await this.#embedMessage.delete();
-      }
-      return;
+      this.setEmbedMessage(newEmbedMessage);
     } catch (error) {
       console.error(error);
     }
@@ -65,7 +54,7 @@ module.exports = class QueueData {
   /**
    * @param {Message} newEmbedMessage
    */
-  setEmbedMessage(newEmbedMessage) {
+  async setEmbedMessage(newEmbedMessage) {
     if (newEmbedMessage.embeds.length != 1) {
       let str;
       switch (newEmbedMessage.embeds.length) {
@@ -81,9 +70,19 @@ module.exports = class QueueData {
       );
     }
 
-    this.deleteEmbedMessage();
+    await this.deleteEmbedMessage();
 
     this.#embedMessage = newEmbedMessage;
     return;
+  }
+
+  async deleteEmbedMessage() {
+    try {
+      if (!!this.#embedMessage) {
+        await this.#embedMessage.delete();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 };

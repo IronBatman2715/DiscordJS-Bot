@@ -5,13 +5,14 @@ const getGuildQueue = require("../../functions/getGuildQueue.js");
 module.exports = new Command(
   "music",
   {
-    name: "play",
-    description: "Plays a song or adds it to the end of the music queue.",
+    name: "playlist",
+    description: "Plays a playlist or adds it to the end of the music queue.",
     options: [
       {
-        name: "song",
+        name: "playlist",
         description: "A URL or search query.",
         type: ApplicationCommandOptionType.String,
+        required: true,
       },
     ],
   },
@@ -23,22 +24,14 @@ module.exports = new Command(
       });
     }
 
-    //No new song entered, assume user wants to resume music queue
-    if (args.length != 1) {
-      /** @type {Command} */
-      const resumeCommand = client.commands.get("resume");
-      if (!resumeCommand) return;
-      return await client.runCommand(resumeCommand, interaction, args);
-    }
-
-    const [songQuery] = args;
+    const [playlistQuery] = args;
 
     let guildQueue = getGuildQueue(client, interaction);
 
     await guildQueue.join(interaction.member.voice.channel);
 
-    await guildQueue.play(songQuery, {
-      timecode: true,
+    await guildQueue.playlist(playlistQuery, {
+      shuffle: false,
       requestedBy: interaction.user,
     });
   }

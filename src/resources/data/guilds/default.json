@@ -1,5 +1,4 @@
 {
-  "prefix": "!",
   "greetings": [
     "Hello!",
     "Hello there!",
@@ -13,5 +12,6 @@
     "Ah, hello human"
   ],
   "maxMessagesCleared": 100,
-  "designatedMusicChannelIds": []
+  "musicChannel": "",
+  "defaultRepeatMode": 0
 }

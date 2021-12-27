@@ -1,62 +1,71 @@
-const Command = require("../../structures/Command.js");
 const { RepeatMode } = require("discord-music-player");
+const Command = require("../../structures/Command.js");
+const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 
-module.exports = new Command({
-  name: "repeat",
-  extraArguments: [
-    {
-      name: "option",
-      type: "string",
-      required: true,
-    },
-  ],
-  description: `Set the repeat mode of the music queue.`,
+module.exports = new Command(
+  "music",
+  {
+    name: "repeat",
+    description: "Set the repeat mode of the music queue.",
+    options: [
+      {
+        name: "option",
+        description: "Repeat mode to use.",
+        type: ApplicationCommandOptionType.Integer,
+        required: true,
+        choices: [
+          {
+            name: "disable",
+            value: RepeatMode.DISABLED,
+          },
+          {
+            name: "song",
+            value: RepeatMode.SONG,
+          },
+          {
+            name: "queue",
+            value: RepeatMode.QUEUE,
+          },
+        ],
+      },
+    ],
+  },
 
-  async run(message, args, client) {
-    const { prefix } = client.getGuildConfig(message.guildId);
-
+  async (client, interaction, args) => {
     //Get queue
     let guildQueue;
-    if (client.player.hasQueue(message.guild.id)) {
-      guildQueue = client.player.getQueue(message.guild.id);
+    if (client.player.hasQueue(interaction.guildId)) {
+      guildQueue = client.player.getQueue(interaction.guildId);
     } else {
-      return message.reply("A queue has not been started!");
+      return interaction.followUp({
+        content:
+          "Cannot set the repeat mode of a queue that has not been started!",
+      });
     }
 
-    //Argument(s) check
-    let errorStr = `Must enter what you want to repeat after "repeat"! Options are: "none", "song", and "queue"
-          \nEx: ${prefix}repeat song`;
-    if (!(args.length == 1 || args.length == 2)) {
-      return message.reply(errorStr);
+    const [repeatMode] = args;
+    let repeatModeStr;
+    switch (repeatMode) {
+      case RepeatMode.DISABLED:
+        repeatModeStr = "disabled";
+        break;
+      case RepeatMode.SONG:
+        repeatModeStr = "song";
+        break;
+      case RepeatMode.QUEUE:
+        repeatModeStr = "queue";
+        break;
     }
 
     //Change the repeat behvior of the queue
-    switch (args[1].toLowerCase()) {
-      case "stop":
-      case "off":
-      case "none":
-        if (guildQueue.repeatMode == RepeatMode.DISABLED) {
-          return message.reply("Already set to do no repeats!");
-        }
-        guildQueue.setRepeatMode(RepeatMode.DISABLED);
-        return message.reply(
-          "Neither the current song nor the queue will repeat now!"
-        );
-      case "song":
-        if (guildQueue.repeatMode == RepeatMode.SONG) {
-          return message.reply("Already set to repeat the current song!");
-        }
-        guildQueue.setRepeatMode(RepeatMode.SONG);
-        return message.reply("The current song will repeat now!");
-      case "queue":
-        if (guildQueue.repeatMode == RepeatMode.QUEUE) {
-          return message.reply("Already set to repeat the queue!");
-        }
-        guildQueue.setRepeatMode(RepeatMode.QUEUE);
-        return message.reply("The queue will repeat now!");
-
-      default:
-        return message.reply(errorStr);
+    if (guildQueue.repeatMode == repeatMode) {
+      return interaction.followUp({
+        content: `Already set to that repeat mode (${repeatModeStr})!`,
+      });
     }
-  },
-});
+    guildQueue.setRepeatMode(repeatMode);
+    return interaction.followUp({
+      content: `Set music queue repeat mode to: ${repeatModeStr}!`,
+    });
+  }
+);
