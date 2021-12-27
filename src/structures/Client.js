@@ -10,7 +10,11 @@ module.exports = class Client extends Discord.Client {
     console.log("*** DISCORD JS BOT: INITIALIZATION ***");
 
     super({
-      intents: new Discord.Intents(32767),
+      intents: new Discord.Intents([
+        Discord.Intents.FLAGS.GUILD_MESSAGES,
+        Discord.Intents.FLAGS.GUILDS,
+        Discord.Intents.FLAGS.GUILD_VOICE_STATES,
+      ]),
       allowedMentions: { repliedUser: false },
     });
 
