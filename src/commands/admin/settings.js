@@ -73,7 +73,7 @@ module.exports = new Command({
  * @returns {boolean}
  */
 async function isValidSettingName(settingName) {
-  const defaultGuildConfig = require("../../data/guilds/default.json");
+  const defaultGuildConfig = require("../../resources/data/guilds/default.json");
 
   if (defaultGuildConfig.hasOwnProperty(settingName)) {
     return true;
@@ -130,7 +130,7 @@ async function displayCurrentSettings(message, client) {
 
   return await message.reply({
     embeds: [currentSettingsEmbed],
-    files: ["./src/resources/icons/settings.png"],
+    files: ["./src/resources/assets/icons/settings.png"],
   });
 }
 
@@ -210,7 +210,7 @@ async function changeSetting(message, client, settingName, newSettingValue) {
   );
 
   fs.writeFileSync(
-    `./src/data/guilds/${message.guildId}.json`,
+    `./src/resources/data/guilds/${message.guildId}.json`,
     JSON.stringify(newGuildConfig, null, "\t")
   );
   console.log(

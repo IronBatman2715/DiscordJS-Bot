@@ -6,7 +6,7 @@
 module.exports = (userType, userId) => {
   switch (userType) {
     case "dev": {
-      require("dotenv").config({ path: "src/data/.env" });
+      require("dotenv").config({ path: "src/resources/data/.env" });
       const devIds = process.env.DEV_IDS.split(", ");
       return devIds.filter((id) => id == userId).length == 1;
     }

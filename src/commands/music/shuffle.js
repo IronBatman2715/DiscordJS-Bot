@@ -2,7 +2,7 @@ const Command = require("../../structures/Command.js");
 
 module.exports = new Command({
   name: "shuffle",
-  description: "Get music queue or do things to it.",
+  description: "Shuffles the songs currently in the music queue.",
 
   async run(message, args, client) {
     //Get queue

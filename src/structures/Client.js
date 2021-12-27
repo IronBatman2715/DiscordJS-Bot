@@ -14,7 +14,7 @@ module.exports = class Client extends Discord.Client {
       allowedMentions: { repliedUser: false },
     });
 
-    this.config = require("../data/config.json"); //universal bot configs
+    this.config = require("../resources/data/config.json"); //universal bot configs
 
     console.log(`Loading ${this.config.name} v${this.config.version}`);
   }
@@ -98,7 +98,7 @@ module.exports = class Client extends Discord.Client {
    */
   getGuildConfig(guildId) {
     let guildConfigFileName = fs
-      .readdirSync("./src/data/guilds")
+      .readdirSync("./src/resources/data/guilds")
       .filter((file) => file == `${guildId}.json`);
 
     switch (guildConfigFileName.length) {
@@ -111,19 +111,19 @@ module.exports = class Client extends Discord.Client {
         guildConfigFileName = `${guildId}.json`;
 
         fs.copyFileSync(
-          "./src/data/guilds/default.json",
-          `./src/data/guilds/${guildConfigFileName}`
+          "./src/resources/data/guilds/default.json",
+          `./src/resources/data/guilds/${guildConfigFileName}`
         );
       }
       case 1:
-        return require(`../data/guilds/${guildConfigFileName}`);
+        return require(`../resources/data/guilds/${guildConfigFileName}`);
 
       default:
         message.reply(
           "Found multiple config files for your server! Using default for now.\nAsk dev to check out this bug!"
         );
 
-        return require(`../data/guilds/default.json`);
+        return require(`../resources/data/guilds/default.json`);
     }
   }
 };

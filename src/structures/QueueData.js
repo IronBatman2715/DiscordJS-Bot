@@ -42,7 +42,7 @@ module.exports = class QueueData {
     this.setEmbedMessage(
       await this.musicTextChannel.send({
         embeds: [nowPlayingEmbed],
-        files: ["./src/resources/icons/music.png"],
+        files: ["./src/resources/assets/icons/music.png"],
       })
     );
   }
