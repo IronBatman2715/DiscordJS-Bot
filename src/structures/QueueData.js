@@ -38,22 +38,28 @@ module.exports = class QueueData {
       },
     }).setThumbnail("attachment://music.png");
 
-    //Send/upadate and save embed as message
-    this.setEmbedMessage(
-      await this.musicTextChannel.send({
-        embeds: [nowPlayingEmbed],
-        files: ["./src/resources/assets/icons/music.png"],
-      })
-    );
+    try {
+      //Send/upadate and save embed as message
+      this.setEmbedMessage(
+        await this.musicTextChannel.send({
+          embeds: [nowPlayingEmbed],
+          files: ["./src/resources/assets/icons/music.png"],
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async deleteEmbedMessage() {
-    if (typeof this.#embedMessage !== "undefined") {
-      if (!this.#embedMessage.deleted) {
+    try {
+      if (typeof this.#embedMessage !== "undefined") {
         return await this.#embedMessage.delete();
       }
+      return;
+    } catch (error) {
+      console.error(error);
     }
-    return;
   }
 
   /**
@@ -72,12 +78,6 @@ module.exports = class QueueData {
       }
       return console.error(
         `Error => QueueData.setEmbedMessage: newEmbedMessage has ${str}`
-      );
-    }
-
-    if (newEmbedMessage.deleted) {
-      return console.error(
-        "Error => QueueData.setEmbedMessage: newEmbedMessage is already deleted!"
       );
     }
 
