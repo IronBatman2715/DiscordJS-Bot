@@ -72,7 +72,6 @@ module.exports = class Client extends Discord.Client {
     //Register with DiscordAPI
     const { REST } = require("@discordjs/rest");
     const { Routes } = require("discord-api-types/v9");
-    require("dotenv").config({ path: "src/resources/data/.env" });
 
     const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
 
@@ -242,7 +241,6 @@ module.exports = class Client extends Discord.Client {
       //Developer only commands
       case "dev": {
         const isUser = require("../functions/isUser.js");
-        require("dotenv").config({ path: "src/resources/data/.env" });
 
         if (
           !isUser(interaction.member, {
