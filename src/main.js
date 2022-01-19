@@ -2,6 +2,6 @@ console.clear();
 
 const Client = require("./structures/Client.js");
 const client = new Client();
-require("dotenv").config({ path: "src/resources/data/.env" });
+require("dotenv").config();
 
 client.start(process.env.TOKEN);

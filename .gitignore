@@ -1,4 +1,4 @@
 node_modules
-src/resources/data/.env
+.env
 src/resources/data/guilds/*
 !src/resources/data/guilds/default.json
