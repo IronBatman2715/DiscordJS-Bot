@@ -7,10 +7,7 @@ module.exports = class Client extends Discord.Client {
     console.log("*** DISCORD JS BOT: INITIALIZATION ***");
 
     super({
-      intents: [
-        Discord.Intents.FLAGS.GUILDS,
-        Discord.Intents.FLAGS.GUILD_VOICE_STATES,
-      ],
+      intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_VOICE_STATES],
       allowedMentions: { repliedUser: false },
     });
 
@@ -51,10 +48,7 @@ module.exports = class Client extends Discord.Client {
             const command = require(`../commands/${folder}/${file}`);
 
             if (command.type != folder) {
-              console.log(
-                "Improper type assigned to command: ",
-                command.data.name
-              );
+              console.log("Improper type assigned to command: ", command.data.name);
             }
 
             if (command.type == "dev" && !devMode) {
@@ -84,10 +78,7 @@ module.exports = class Client extends Discord.Client {
           log(` DEV MODE. ONLY REGISTERING IN "TEST_GUILD_ID" FROM .ENV\n`);
           //rest.delete();
           await rest.put(
-            Routes.applicationGuildCommands(
-              process.env.CLIENT_ID,
-              process.env.TEST_GUILD_ID
-            ),
+            Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.TEST_GUILD_ID),
             {
               body: commandDataArr,
             }
@@ -146,10 +137,7 @@ module.exports = class Client extends Discord.Client {
          * @type {PlayerEvent}
          */
         const playerEvent = require(`../playerEvents/${file}`);
-        this.player.on(
-          playerEventName,
-          playerEvent.runFunction.bind(null, this)
-        );
+        this.player.on(playerEventName, playerEvent.runFunction.bind(null, this));
         console.log(`\t${playerEventName}`);
       });
   }
@@ -168,7 +156,9 @@ module.exports = class Client extends Discord.Client {
       embed.setColor("DARK_BLUE");
     }
     if (!data.hasOwnProperty("footer")) {
-      embed.setFooter(this.config.name);
+      embed.setFooter({
+        text: this.config.name,
+      });
     }
 
     return embed;
@@ -190,9 +180,7 @@ module.exports = class Client extends Discord.Client {
     switch (guildConfigFileName.length) {
       //Guild config file does not exist yet
       case 0: {
-        console.log(
-          "Guild config file not present. Generating one with the default values!"
-        );
+        console.log("Guild config file not present. Generating one with the default values!");
 
         guildConfigFileName = `${guildId}.json`;
 
@@ -260,9 +248,7 @@ module.exports = class Client extends Discord.Client {
         const { musicChannel } = this.getGuildConfig(interaction.guildId);
 
         if (musicChannel != "" && interaction.channelId != musicChannel) {
-          const musicChannelObj = await interaction.guild.channels.fetch(
-            musicChannel
-          );
+          const musicChannelObj = await interaction.guild.channels.fetch(musicChannel);
           return interaction.followUp({
             content: `Must enter music commands in ${musicChannelObj}!`,
           });

@@ -13,7 +13,7 @@ module.exports = new Command(
       guildQueue = client.player.getQueue(interaction.guildId);
     } else {
       return interaction.followUp({
-        content: `The queue is empty! Add a song or playlist using "${prefix}play"`,
+        content: `The queue is empty! Add a song or playlist using "/play"`,
       });
     }
 
