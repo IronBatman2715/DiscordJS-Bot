@@ -1,6 +1,7 @@
 const { RepeatMode } = require("discord-music-player");
 const Command = require("../../structures/Command.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
+const repeatModeEnum2Str = require("../../functions/repeatModeEnum2Str.js");
 
 module.exports = new Command(
   "music",
@@ -38,24 +39,12 @@ module.exports = new Command(
       guildQueue = client.player.getQueue(interaction.guildId);
     } else {
       return interaction.followUp({
-        content:
-          "Cannot set the repeat mode of a queue that has not been started!",
+        content: "Cannot set the repeat mode of a queue that has not been started!",
       });
     }
 
     const [repeatMode] = args;
-    let repeatModeStr;
-    switch (repeatMode) {
-      case RepeatMode.DISABLED:
-        repeatModeStr = "disabled";
-        break;
-      case RepeatMode.SONG:
-        repeatModeStr = "song";
-        break;
-      case RepeatMode.QUEUE:
-        repeatModeStr = "queue";
-        break;
-    }
+    const repeatModeStr = repeatModeEnum2Str(repeatMode).toLowerCase();
 
     //Change the repeat behvior of the queue
     if (guildQueue.repeatMode == repeatMode) {

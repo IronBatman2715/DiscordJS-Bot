@@ -1,5 +1,5 @@
-const { RepeatMode } = require("discord-music-player");
 const Command = require("../../structures/Command.js");
+const repeatModeEnum2Str = require("../../functions/repeatModeEnum2Str.js");
 
 module.exports = new Command(
   "music",
@@ -32,29 +32,14 @@ module.exports = new Command(
     let queueFieldArr = [];
     for (let i = 0; i < guildQueue.songs.length; i++) {
       queueFieldArr[i] = {
-        name: `${i + 1}: [${guildQueue.songs[i].name}] (${
-          guildQueue.songs[i].url
-        })`,
+        name: `${i + 1}: [${guildQueue.songs[i].name}] (${guildQueue.songs[i].url})`,
         value: `by: ${guildQueue.songs[i].author}\nrequested by: ${guildQueue.songs[i].requestedBy}\n`,
         inline: false,
       };
     }
 
-    let repeatModeStr;
-    switch (guildQueue.repeatMode) {
-      case RepeatMode.SONG:
-        repeatModeStr = "Song";
-        break;
-      case RepeatMode.QUEUE:
-        repeatModeStr = "Queue";
-        break;
-
-      default:
-        guildQueue.setRepeatMode(RepeatMode.DISABLED);
-      case RepeatMode.DISABLED:
-        repeatModeStr = "Disabled";
-        break;
-    }
+    let repeatModeStr = repeatModeEnum2Str(guildQueue.repeatMode);
+    repeatModeStr = repeatModeStr[0].toUpperCase() + repeatModeStr.slice(1).toLowerCase();
 
     const queueEmbed = client.genEmbed({
       title: `Music Queue (${guildQueue.songs.length} song${

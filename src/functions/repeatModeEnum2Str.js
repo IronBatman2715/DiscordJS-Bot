@@ -14,7 +14,7 @@ module.exports = (repeatMode) => {
       return "QUEUE";
 
     default: {
-      console.log("Error in getRepeatMode!");
+      console.log("Error in repeatModeEnum2Str!");
       return "DISABLED";
     }
   }

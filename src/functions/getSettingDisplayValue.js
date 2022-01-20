@@ -8,9 +8,7 @@ module.exports =
    * @param {Guild} guild
    */
   async (arg, guild) => {
-    const settingsFilter = settingsInfo.filter(
-      (setting) => setting.name == arg.name
-    );
+    const settingsFilter = settingsInfo.filter((setting) => setting.name == arg.name);
 
     if (settingsFilter.length == 1) {
       const [setting] = settingsFilter;
@@ -20,8 +18,8 @@ module.exports =
           return (await guild.channels.fetch(arg.value)).name;
         }
         case "defaultRepeatMode": {
-          const getRepeatMode = require("./getRepeatMode");
-          return getRepeatMode(arg.value);
+          const repeatModeEnum2Str = require("./repeatModeEnum2Str.js");
+          return repeatModeEnum2Str(arg.value);
         }
 
         default:
