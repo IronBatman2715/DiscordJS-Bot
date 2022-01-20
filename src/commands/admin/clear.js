@@ -24,10 +24,9 @@ module.exports = new Command(
     //console.log("quantity: {", typeof quantity, "} ", quantity);
 
     const { maxMessagesCleared } = client.getGuildConfig(interaction.guildId);
-    const range = [1, maxMessagesCleared];
 
     //Check if desired number is within allowed range
-    if (!isInRange(quantity)) {
+    if (!isInRange(quantity, 1, maxMessagesCleared)) {
       return await interaction.followUp({
         content: `You can not clear ${quantity} messages! Allowed range is from 1 to ${maxMessagesCleared}.`,
       });
