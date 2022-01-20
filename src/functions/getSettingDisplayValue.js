@@ -1,9 +1,9 @@
 const { Guild } = require("discord.js");
-const settingsInfo = require("../resources/data/guilds/settingsInfo.js");
+const settingsInfo = require("../resources/data/settingsInfo.js");
 
 module.exports =
   /**
-   * @typedef {{name: string, type: string, value: number | string, range?: number[]}} ArgData
+   * @typedef {{name: string, type: string, value: number | string | string[], range?: number[]}} ArgData
    * @param {ArgData} arg
    * @param {Guild} guild
    */

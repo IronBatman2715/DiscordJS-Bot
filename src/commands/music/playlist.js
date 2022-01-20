@@ -26,7 +26,7 @@ module.exports = new Command(
 
     const [playlistQuery] = args;
 
-    let guildQueue = getGuildQueue(client, interaction);
+    let guildQueue = await getGuildQueue(client, interaction);
 
     await guildQueue.join(interaction.member.voice.channel);
 

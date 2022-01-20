@@ -8,7 +8,7 @@ module.exports = new Command(
   },
 
   async (client, interaction, args) => {
-    const { greetings } = client.getGuildConfig(interaction.guildId);
+    const { greetings } = await client.DB.getGuildConfig(interaction.guildId);
 
     const index = Math.floor(Math.random() * greetings.length);
 

@@ -23,7 +23,7 @@ module.exports = new Command(
     const [quantity] = args;
     //console.log("quantity: {", typeof quantity, "} ", quantity);
 
-    const { maxMessagesCleared } = client.getGuildConfig(interaction.guildId);
+    const { maxMessagesCleared } = await client.DB.getGuildConfig(interaction.guildId);
 
     //Check if desired number is within allowed range
     if (!isInRange(quantity, 1, maxMessagesCleared)) {

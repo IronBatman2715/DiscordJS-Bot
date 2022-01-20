@@ -92,9 +92,7 @@ module.exports =
         }
 
         default: {
-          return console.log(
-            "Could not match customId of select menu to one of this bot's!"
-          );
+          return console.log("Could not match customId of select menu to one of this bot's!");
         }
       }
     }

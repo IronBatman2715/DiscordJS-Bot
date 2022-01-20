@@ -1,17 +1,14 @@
 const { CommandInteraction, EmbedFieldData } = require("discord.js");
 const Client = require("../../structures/Client.js");
 const Command = require("../../structures/Command.js");
-const {
-  ApplicationCommandOptionType,
-  ChannelType,
-} = require("discord-api-types/v9");
+const { ApplicationCommandOptionType, ChannelType } = require("discord-api-types/v9");
 const { RepeatMode } = require("discord-music-player");
 
 /**
  * @typedef {{name: string, type: string, range?: number[], description: string}} SettingsInfo
  * @type {SettingsInfo[]}
  */
-const settingsInfo = require("../../resources/data/guilds/settingsInfo.js");
+const settingsInfo = require("../../resources/data/settingsInfo.js");
 
 module.exports = new Command(
   "admin",
@@ -78,8 +75,7 @@ module.exports = new Command(
           },
           {
             name: "disable",
-            description:
-              "Allow any text channel to be used for music commands.",
+            description: "Allow any text channel to be used for music commands.",
             type: ApplicationCommandOptionType.Subcommand,
           },
         ],
@@ -125,15 +121,12 @@ module.exports = new Command(
 
         //User wants to reset settings
         case "reset": {
-          return await interaction.followUp({
-            content: "Subcommand is not working currently (WIP)!",
-          });
           return await resetSettings(interaction, client);
         }
 
         default: {
           return await interaction.followUp({
-            content: "Error is settings! Tell dev please!",
+            content: "Error in settings! Tell dev please!",
           });
         }
       }
@@ -162,12 +155,14 @@ module.exports = new Command(
  * @param {Client} client
  */
 async function displayCurrentSettings(interaction, client) {
-  const currentGuildConfig = client.getGuildConfig(interaction.guildId);
+  const currentGuildConfig = await client.DB.getGuildConfig(interaction.guildId);
 
   /** @type {EmbedFieldData[]} */
   let settingsFieldArr = [];
   for (const propt in currentGuildConfig) {
+    if (propt[0] === "_" || propt === "guildId") continue;
     let currentValue = currentGuildConfig[propt];
+    console.log("propt: ", propt, "\ncurrentValue: ", currentValue);
 
     if (Array.isArray(currentGuildConfig[propt])) {
       const array = currentGuildConfig[propt];
@@ -183,25 +178,24 @@ async function displayCurrentSettings(interaction, client) {
 
     const [setting] = settingsInfo.filter((setting) => setting.name == propt);
     /**
-     * @typedef {{name: string, type: string, value: number | string, range?: number[]}} ArgData
+     * @typedef {{name: string, type: string, value: number | string | string[], range?: number[]}} ArgData
      * @type {ArgData}
      */
     const argData = {
       name: propt,
-      type: "",
+      type: setting.type,
       value: currentValue,
     };
 
     const getSettingDisplayValue = require("../../functions/getSettingDisplayValue.js");
 
     settingsFieldArr.push({
-      name: `\`${propt}\`: \`${await getSettingDisplayValue(
-        argData,
-        interaction.guild
-      )}\``,
+      name: `\`${propt}\`: \`${await getSettingDisplayValue(argData, interaction.guild)}\``,
       value: setting.description,
       inline: false,
     });
+
+    console.log();
   }
 
   const currentSettingsEmbed = client.genEmbed({
@@ -224,19 +218,15 @@ async function displayCurrentSettings(interaction, client) {
  */
 async function resetSettings(interaction, client) {
   try {
-    const fs = require("fs");
-    fs.copyFileSync(
-      "./src/resources/data/guilds/default.json",
-      `./src/resources/data/guilds/${interaction.guildId}.json`
-    );
+    await client.DB.deleteGuildConfig(interaction.guildId);
 
-    return interaction.followUp({
+    return await interaction.followUp({
       content: `Reset guild/server settings!`,
     });
   } catch (error) {
     console.error(error);
 
-    return interaction.followUp({
+    return await interaction.followUp({
       content: `FAILED to reset guild/server settings!`,
     });
   }
@@ -248,20 +238,11 @@ async function resetSettings(interaction, client) {
  * @param {string} settingName
  * @param {String | Number} newSettingValue
  */
-async function changeSetting(
-  interaction,
-  client,
-  settingName,
-  newSettingValue
-) {
-  const [setting] = settingsInfo.filter(
-    (setting) => setting.name.toLowerCase() == settingName
-  );
-
-  const currentGuildConfig = client.getGuildConfig(interaction.guildId);
+async function changeSetting(interaction, client, settingName, newSettingValue) {
+  const [setting] = settingsInfo.filter((setting) => setting.name.toLowerCase() == settingName);
 
   /**
-   * @typedef {{name: string, type: string, value: number | string, range?: number[]}} ArgData
+   * @typedef {{name: string, type: string, value: number | string | string[], range?: number[]}} ArgData
    * @type {ArgData}
    */
   const newValueArg = {
@@ -280,40 +261,24 @@ async function changeSetting(
   }
 
   //If entry is a number, check if it is in allowed range
-  if (
-    (typeof newValueArg.value).toLowerCase() == "number" &&
-    newValueArg.range != []
-  ) {
+  if ((typeof newValueArg.value).toLowerCase() == "number" && newValueArg.range != []) {
     console.log("Checking if number is in range");
     const isInRange = require("../../functions/isInRange.js");
-    if (
-      !isInRange(newValueArg.value, newValueArg.range[0], newValueArg.range[1])
-    ) {
+    if (!isInRange(newValueArg.value, newValueArg.range[0], newValueArg.range[1])) {
       return await interaction.followUp({
         content: `Entered value is out of allowed range: [${newValueArg.range[0]}, ${newValueArg.range[1]}]!`,
       });
     }
   }
 
-  let newGuildConfig = currentGuildConfig;
-  newGuildConfig[newValueArg.name] =
-    newValueArg.type == "integer"
-      ? Number(newValueArg.value)
-      : newValueArg.value;
-  console.log(
-    `New guild config [GuildId: ${interaction.guildId}]\n`,
-    newGuildConfig,
-    "\n"
-  );
+  await client.DB.updateGuildConfig(interaction.guildId, {
+    [newValueArg.name]:
+      newValueArg.type == "integer" ? Number(newValueArg.value) : newValueArg.value,
+  });
 
-  const fs = require("fs");
-  fs.writeFileSync(
-    `./src/resources/data/guilds/${interaction.guildId}.json`,
-    JSON.stringify(newGuildConfig, null, "\t")
-  );
   console.log(
     `Saved new guild config [GuildId: ${interaction.guildId}]\n`,
-    client.getGuildConfig(interaction.guildId),
+    await client.DB.getGuildConfig(interaction.guildId),
     "\n"
   );
 

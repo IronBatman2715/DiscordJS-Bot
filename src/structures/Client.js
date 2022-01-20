@@ -22,6 +22,9 @@ module.exports = class Client extends Discord.Client {
     this.registerEvents();
     this.registerPlayerEvents();
 
+    const DB = require("./DB.js");
+    this.DB = new DB();
+
     console.log("*** DISCORD JS BOT: INITIALIZATION DONE ***");
 
     log("Logging in... ");
@@ -165,45 +168,6 @@ module.exports = class Client extends Discord.Client {
   }
 
   /**
-   * Get the guild config data corresponding to guildId. If does not exist, generate based on defaults!
-   * @typedef {{greetings: string[], maxMessagesCleared: Number, musicChannel: string, defaultRepeatMode: number}} GuildConfig
-   * @param {string} guildId
-   * @returns {GuildConfig}
-   */
-  getGuildConfig(guildId) {
-    const fs = require("fs");
-    let guildConfigFileName = fs
-      .readdirSync("./src/resources/data/guilds")
-      .filter((file) => file.endsWith(".json"))
-      .filter((file) => file == `${guildId}.json`);
-
-    switch (guildConfigFileName.length) {
-      //Guild config file does not exist yet
-      case 0: {
-        console.log("Guild config file not present. Generating one with the default values!");
-
-        guildConfigFileName = `${guildId}.json`;
-
-        fs.copyFileSync(
-          "./src/resources/data/guilds/default.json",
-          `./src/resources/data/guilds/${guildConfigFileName}`
-        );
-      }
-      case 1: {
-        return require(`../resources/data/guilds/${guildConfigFileName}`);
-      }
-
-      default: {
-        console.log(
-          `Found multiple config files for a server [guilId: ${guildId}]! Using default for now.`
-        );
-
-        return require(`../resources/data/guilds/default.json`);
-      }
-    }
-  }
-
-  /**
    * @param {Command} command
    * @param {Discord.CommandInteraction} interaction
    * @param {any[]} args
@@ -245,7 +209,7 @@ module.exports = class Client extends Discord.Client {
       }
 
       case "music": {
-        const { musicChannel } = this.getGuildConfig(interaction.guildId);
+        const { musicChannel } = await this.DB.getGuildConfig(interaction.guildId);
 
         if (musicChannel != "" && interaction.channelId != musicChannel) {
           const musicChannelObj = await interaction.guild.channels.fetch(musicChannel);
@@ -264,8 +228,7 @@ module.exports = class Client extends Discord.Client {
 
     try {
       await command.run(this, interaction, args);
-      console.log(`Ran Commands/${command.type}/${command.data.name}`);
-      console.log();
+      console.log(`Ran Commands/${command.type}/${command.data.name}\n`);
     } catch (error) {
       console.error(error);
       return interaction.followUp({
