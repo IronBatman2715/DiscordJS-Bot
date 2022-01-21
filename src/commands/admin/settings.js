@@ -160,9 +160,10 @@ async function displayCurrentSettings(interaction, client) {
   /** @type {EmbedFieldData[]} */
   let settingsFieldArr = [];
   for (const propt in currentGuildConfig) {
+    //Ignore _id and __v
     if (propt[0] === "_" || propt === "guildId") continue;
+
     let currentValue = currentGuildConfig[propt];
-    console.log("propt: ", propt, "\ncurrentValue: ", currentValue);
 
     if (Array.isArray(currentGuildConfig[propt])) {
       const array = currentGuildConfig[propt];
@@ -177,6 +178,7 @@ async function displayCurrentSettings(interaction, client) {
     }
 
     const [setting] = settingsInfo.filter((setting) => setting.name == propt);
+
     /**
      * @typedef {{name: string, type: string, value: number | string | string[], range?: number[]}} ArgData
      * @type {ArgData}
@@ -194,8 +196,6 @@ async function displayCurrentSettings(interaction, client) {
       value: setting.description,
       inline: false,
     });
-
-    console.log();
   }
 
   const currentSettingsEmbed = client.genEmbed({

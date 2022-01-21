@@ -6,5 +6,12 @@ module.exports =
    * @returns {boolean}
    */
   (value, min = 1, max = Number.MAX_SAFE_INTEGER) => {
+    if (min > max) {
+      return false;
+    }
+    if (min == max) {
+      return value == min;
+    }
+
     return min <= value && value <= max;
   };

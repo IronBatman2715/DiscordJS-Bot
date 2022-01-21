@@ -31,33 +31,37 @@ module.exports = class DB {
    * @returns {Promise<GuildConfig>}
    */
   async getGuildConfig(guildId) {
-    const guildConfigSearch = await GuildConfigModel.find({
-      guildId,
-    });
+    try {
+      const guildConfigSearch = await GuildConfigModel.find({
+        guildId,
+      });
 
-    switch (guildConfigSearch.length) {
-      //Guild config document does not exist yet
-      case 0: {
-        console.log("Guild config file not present. Generating one with the default values!");
+      switch (guildConfigSearch.length) {
+        //Guild config document does not exist yet
+        case 0: {
+          console.log("Guild config file not present. Generating one with the default values!");
 
-        //Create new
-        const guildConfigDefault = new GuildConfigModel({
-          guildId,
-        });
+          //Create new
+          const guildConfigDefault = new GuildConfigModel({
+            guildId,
+          });
 
-        //Save to DB
-        const guildConfigNew = await guildConfigDefault.save();
+          //Save to DB
+          const guildConfigNew = await guildConfigDefault.save();
 
-        console.log("New document matching current guildId: ", guildConfigNew);
-        return guildConfigNew.toObject();
+          console.log("New document matching current guildId: ", guildConfigNew);
+          return guildConfigNew.toObject();
+        }
+        case 1: {
+          return guildConfigSearch[0].toObject();
+        }
+
+        default: {
+          console.log(`Found multiple config files for a server [guilId: ${guildId}]!`);
+        }
       }
-      case 1: {
-        return guildConfigSearch[0].toObject();
-      }
-
-      default: {
-        console.log(`Found multiple config files for a server [guilId: ${guildId}]!`);
-      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -69,7 +73,9 @@ module.exports = class DB {
    * @returns {Promise<GuildConfig>}
    */
   async updateGuildConfig(guildId, guildConfig) {
-    return await GuildConfigModel.updateOne({ guildId }, guildConfig);
+    return await GuildConfigModel.updateOne({ guildId }, guildConfig).catch((error) =>
+      console.error(error)
+    );
   }
 
   /**
@@ -77,6 +83,6 @@ module.exports = class DB {
    * @param {string} guildId
    */
   async deleteGuildConfig(guildId) {
-    return await GuildConfigModel.deleteOne({ guildId });
+    return await GuildConfigModel.deleteOne({ guildId }).catch((error) => console.error(error));
   }
 };
