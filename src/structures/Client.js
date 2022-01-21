@@ -17,7 +17,7 @@ module.exports = class Client extends Discord.Client {
   }
 
   /** Register bot and login */
-  start(token) {
+  start() {
     this.registerCommands();
     this.registerEvents();
     this.registerPlayerEvents();
@@ -28,7 +28,7 @@ module.exports = class Client extends Discord.Client {
     console.log("*** DISCORD JS BOT: INITIALIZATION DONE ***");
 
     log("Logging in... ");
-    this.login(token);
+    this.login(process.env.TOKEN);
   }
 
   /** Register slash commands */
