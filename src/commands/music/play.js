@@ -12,23 +12,17 @@ module.exports = new Command(
         name: "song",
         description: "A URL or search query.",
         type: ApplicationCommandOptionType.String,
+        required: true,
       },
     ],
   },
 
   async (client, interaction, args) => {
+    //Check if user is currently in a voice channel
     if (!interaction.member.voice.channel) {
       return await interaction.followUp({
         content: "Join a voice channel first!",
       });
-    }
-
-    //No new song entered, assume user wants to resume music queue
-    if (args.length != 1) {
-      /** @type {Command} */
-      const resumeCommand = client.commands.get("resume");
-      if (!resumeCommand) return;
-      return await client.runCommand(resumeCommand, interaction, args);
     }
 
     const [songQuery] = args;
