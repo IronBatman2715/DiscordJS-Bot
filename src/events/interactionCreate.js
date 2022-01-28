@@ -49,8 +49,8 @@ module.exports =
 
           helpEmbed.setTitle(`${dirName} Commands`);
 
-          const fs = require("fs");
-          fs.readdirSync(`./src/commands/${dir}`)
+          const { readdirSync } = require("fs");
+          readdirSync(`./src/commands/${dir}`)
             .filter((file) => file.endsWith(".js"))
             .forEach((file) => {
               /** @type {Command} */

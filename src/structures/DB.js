@@ -5,8 +5,8 @@ module.exports = class DB {
   constructor() {
     console.log("MongoDB:");
 
-    const fs = require("fs");
-    fs.readdirSync("./src/mongoEvents")
+    const { readdirSync } = require("fs");
+    readdirSync("./src/mongoEvents")
       .filter((file) => file.endsWith(".js"))
       .forEach((file) => {
         /** @type {string} */

@@ -39,10 +39,10 @@ module.exports = class Client extends Discord.Client {
 
     this.commands = new Discord.Collection();
     let commandDataArr = [];
-    const fs = require("fs");
-    fs.readdirSync("./src/commands").forEach((folder) => {
+    const { readdirSync } = require("fs");
+    readdirSync("./src/commands").forEach((folder) => {
       console.log(`\t${folder}`);
-      fs.readdirSync(`./src/commands/${folder}`)
+      readdirSync(`./src/commands/${folder}`)
         .filter((file) => file.endsWith(".js"))
         .forEach(
           /** @param {string} file */
@@ -104,8 +104,8 @@ module.exports = class Client extends Discord.Client {
   registerEvents() {
     console.log("Events:");
 
-    const fs = require("fs");
-    fs.readdirSync("./src/events")
+    const { readdirSync } = require("fs");
+    readdirSync("./src/events")
       .filter((file) => file.endsWith(".js"))
       .forEach(
         /** @param {string} file */
@@ -130,8 +130,8 @@ module.exports = class Client extends Discord.Client {
     this.player = new Player(this, {
       deafenOnJoin: true,
     });
-    const fs = require("fs");
-    fs.readdirSync("./src/playerEvents")
+    const { readdirSync } = require("fs");
+    readdirSync("./src/playerEvents")
       .filter((file) => file.endsWith(".js"))
       .forEach((file) => {
         /** @type {string} */
@@ -183,7 +183,7 @@ module.exports = class Client extends Discord.Client {
             permissions: Discord.Permissions.FLAGS.ADMINISTRATOR,
           })
         ) {
-          return interaction.followUp({
+          return await interaction.followUp({
             content: `This is a administrator only command!`,
           });
         }
@@ -201,7 +201,7 @@ module.exports = class Client extends Discord.Client {
               : process.env.DEV_IDS,
           })
         ) {
-          return interaction.followUp({
+          return await interaction.followUp({
             content: `This is a developer only command!`,
           });
         }
@@ -213,7 +213,7 @@ module.exports = class Client extends Discord.Client {
 
         if (musicChannel != "" && interaction.channelId != musicChannel) {
           const musicChannelObj = await interaction.guild.channels.fetch(musicChannel);
-          return interaction.followUp({
+          return await interaction.followUp({
             content: `Must enter music commands in ${musicChannelObj}!`,
           });
         }
@@ -231,7 +231,7 @@ module.exports = class Client extends Discord.Client {
       console.log(`Ran Commands/${command.type}/${command.data.name}\n`);
     } catch (error) {
       console.error(error);
-      return interaction.followUp({
+      return await interaction.followUp({
         content: `There was an error while executing \`${command.data.name}\` command!`,
       });
     }
