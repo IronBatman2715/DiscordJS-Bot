@@ -1,5 +1,2 @@
 node_modules
 .env
-src/resources/data/guilds/*
-!src/resources/data/guilds/default.json
-!src/resources/data/guilds/settingsInfo.js
