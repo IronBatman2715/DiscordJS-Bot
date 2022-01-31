@@ -135,50 +135,49 @@ module.exports = class Client extends Discord.Client {
   /** Load events */
   loadEvents() {
     console.log("Events:");
+    const { EventEmitter } = require("events");
     const { readdirSync } = require("fs");
-
-    //Discord client
-    console.log("\tClient:");
-    readdirSync("./src/events/client")
-      .filter((file) => file.endsWith(".js"))
-      .forEach((file) => {
-        const eventName = file.slice(0, file.length - 3);
-        const eventFunction = require(`../events/client/${file}`);
-
-        //Tie to this instance
-        this.on(eventName, eventFunction.bind(null, this));
-
-        console.log(`\t\t${eventName}`);
-      });
-
-    //Mongoose
-    console.log("\tMongo:");
     const mongoose = require("mongoose");
-    readdirSync("./src/events/mongo")
-      .filter((file) => file.endsWith(".js"))
-      .forEach((file) => {
-        const eventName = file.slice(0, file.length - 3);
-        const eventFunction = require(`../events/mongo/${file}`);
+    const capitalize = require("../functions/general/capitalize");
 
-        //Tie to this mongoose instance
-        mongoose.connection.on(eventName, eventFunction.bind(null, this));
+    readdirSync("./src/events").forEach((folder) => {
+      console.log(`\t${capitalize(folder)}`);
 
-        console.log(`\t\t${eventName}`);
-      });
+      /** @type {EventEmitter} */
+      let eventObject;
+      switch (folder) {
+        case "client": {
+          eventObject = this;
+          break;
+        }
+        case "mongoose": {
+          eventObject = mongoose.connection;
+          break;
+        }
+        case "music-player": {
+          eventObject = this.player;
+          break;
+        }
 
-    //Discord music player
-    console.log("\tPlayer:");
-    readdirSync("./src/events/player")
-      .filter((file) => file.endsWith(".js"))
-      .forEach((file) => {
-        const eventName = file.slice(0, file.length - 3);
-        const eventFunction = require(`../events/player/${file}`);
+        default: {
+          console.error("Could not match events folder name to event object instance!");
+          return;
+        }
+      }
 
-        //Tie to this player instance
-        this.player.on(eventName, eventFunction.bind(null, this));
+      readdirSync(`./src/events/${folder}`)
+        .filter((file) => file.endsWith(".js"))
+        .forEach((file) => {
+          const eventName = file.slice(0, file.length - 3);
+          /** @type {Function} */
+          const eventFunction = require(`../events/${folder}/${file}`);
 
-        console.log(`\t\t${eventName}`);
-      });
+          //Tie to approriate instance
+          eventObject.on(eventName, eventFunction.bind(null, this));
+
+          console.log(`\t\t${eventName}`);
+        });
+    });
   }
 
   /**
