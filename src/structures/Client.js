@@ -128,7 +128,7 @@ module.exports = class Client extends Discord.Client {
         const eventFunction = require(`../events/mongo/${file}`);
 
         //Tie to this mongoose instance
-        mongoose.connection.on(eventName, (...args) => eventFunction(...args));
+        mongoose.connection.on(eventName, (...args) => eventFunction(this, ...args));
 
         console.log(`\t\t${eventName}`);
       });
@@ -136,7 +136,6 @@ module.exports = class Client extends Discord.Client {
     //Discord music player
     console.log("\tPlayer:");
     const { Player } = require("discord-music-player");
-    const PlayerEvent = require("./PlayerEvent.js");
     this.player = new Player(this, {
       deafenOnJoin: true,
     });
@@ -144,10 +143,10 @@ module.exports = class Client extends Discord.Client {
       .filter((file) => file.endsWith(".js"))
       .forEach((file) => {
         const eventName = file.slice(0, file.length - 3);
-        /** @type {PlayerEvent} */
-        const playerEvent = require(`../events/player/${file}`);
+        const eventFunction = require(`../events/player/${file}`);
 
-        this.player.on(eventName, playerEvent.runFunction.bind(null, this));
+        //Tie to this player instance
+        this.player.on(eventName, eventFunction.bind(null, this));
 
         console.log(`\t\t${eventName}`);
       });

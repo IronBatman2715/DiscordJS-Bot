@@ -1,5 +1,12 @@
-const PlayerEvent = require("../../structures/PlayerEvent.js");
+const { Queue } = require("discord-music-player");
+const Client = require("../../structures/Client.js");
 
-module.exports = new PlayerEvent((client, error, queue) => {
-  console.error(`Error: ${error} in ${queue.guild.name}!`);
-});
+module.exports =
+  /**
+   * @param {Client} client
+   * @param {string} error
+   * @param {Queue} queue
+   */
+  (client, error, queue) => {
+    console.error(`Error: ${error} in ${queue.guild.name}!`);
+  };

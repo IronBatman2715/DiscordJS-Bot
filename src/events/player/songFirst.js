@@ -1,8 +1,7 @@
-const Client = require("../../structures/Client.js");
-const PlayerEvent = require("../../structures/PlayerEvent.js");
 const { Queue, Song } = require("discord-music-player");
+const Client = require("../../structures/Client.js");
 
-module.exports = new PlayerEvent(
+module.exports =
   /**
    * @param {Client} client
    * @param {Queue} queue
@@ -12,5 +11,4 @@ module.exports = new PlayerEvent(
     console.log(`Playing first song in new queue:\n\t${song.name}`);
 
     queue.data.updateNowPlaying(client, song);
-  }
-);
+  };

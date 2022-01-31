@@ -1,9 +1,8 @@
 const { Queue, Playlist } = require("discord-music-player");
 const Client = require("../../structures/Client.js");
-const PlayerEvent = require("../../structures/PlayerEvent.js");
 const tempMessage = require("../../functions/discord/tempMessage.js");
 
-module.exports = new PlayerEvent(
+module.exports =
   /**
    * @param {Client} client
    * @param {Queue} queue
@@ -20,5 +19,4 @@ module.exports = new PlayerEvent(
     } catch (error) {
       console.error(error);
     }
-  }
-);
+  };
