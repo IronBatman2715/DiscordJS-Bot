@@ -1,12 +1,12 @@
 const Client = require("../structures/Client.js");
-const log = require("../functions/general/log.js");
+const logger = require("../functions/general/logger.js");
 
 module.exports =
   /** @param {Client} client */
   (client) => {
     let unusedActivities = setRandomBotPresence(client, client.config.activities.slice());
 
-    log("Online and ready!\n\n");
+    logger("Online and ready!\n\n");
 
     setInterval(() => {
       unusedActivities = setRandomBotPresence(client, unusedActivities);

@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const Command = require("./Command.js");
-const log = require("../functions/general/log.js");
+const logger = require("../functions/general/logger.js");
 
 module.exports = class Client extends Discord.Client {
   constructor() {
@@ -27,7 +27,7 @@ module.exports = class Client extends Discord.Client {
 
     console.log("*** DISCORD JS BOT: INITIALIZATION DONE ***");
 
-    log("Logging in... ");
+    logger("Logging in... ");
     this.login(process.env.TOKEN);
   }
 
@@ -74,11 +74,11 @@ module.exports = class Client extends Discord.Client {
 
     (async () => {
       try {
-        log("Registering commands with DiscordAPI...");
+        logger("Registering commands with DiscordAPI...");
 
         if (devMode) {
           //Instantly register to test guild
-          log(` DEV MODE. ONLY REGISTERING IN "TEST_GUILD_ID" FROM .ENV\n`);
+          logger(` DEV MODE. ONLY REGISTERING IN "TEST_GUILD_ID" FROM .ENV\n`);
           //rest.delete();
           await rest.put(
             Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.TEST_GUILD_ID),
@@ -89,7 +89,7 @@ module.exports = class Client extends Discord.Client {
         } else {
           //Register globally, will take a few minutes to register changes
 
-          log(" DISTRIBUTION MODE. REGISTERING TO ANY SERVER THIS BOT IS IN\n");
+          logger(" DISTRIBUTION MODE. REGISTERING TO ANY SERVER THIS BOT IS IN\n");
           await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
             body: commandDataArr,
           });
