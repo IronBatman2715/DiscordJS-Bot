@@ -1,14 +1,14 @@
 const { CommandInteraction, EmbedFieldData } = require("discord.js");
-const Client = require("../../structures/Client.js");
-const Command = require("../../structures/Command.js");
 const { ApplicationCommandOptionType, ChannelType } = require("discord-api-types/v9");
 const { RepeatMode } = require("discord-music-player");
+const Client = require("../../structures/Client");
+const Command = require("../../structures/Command");
 
 /**
  * @typedef {{name: string, type: string, range?: number[], description: string}} SettingsInfo
  * @type {SettingsInfo[]}
  */
-const settingsInfo = require("../../resources/data/settingsInfo.js");
+const settingsInfo = require("../../resources/data/settingsInfo");
 
 module.exports = new Command(
   {
@@ -189,7 +189,7 @@ async function displayCurrentSettings(interaction, client) {
       value: currentValue,
     };
 
-    const getSettingDisplayValue = require("../../functions/getSettingDisplayValue.js");
+    const getSettingDisplayValue = require("../../functions/getSettingDisplayValue");
 
     settingsFieldArr.push({
       name: `\`${propt}\`: \`${await getSettingDisplayValue(argData, interaction.guild)}\``,
@@ -267,7 +267,7 @@ async function changeSetting(interaction, client, settingName, newSettingValue) 
   //If entry is a number, check if it is in allowed range
   if ((typeof newValueArg.value).toLowerCase() == "number" && newValueArg.range != []) {
     console.log("Checking if number is in range");
-    const isInRange = require("../../functions/general/isInRange.js");
+    const isInRange = require("../../functions/general/isInRange");
     if (!isInRange(newValueArg.value, newValueArg.range[0], newValueArg.range[1])) {
       return await interaction.followUp({
         content: `Entered value is out of allowed range: [${newValueArg.range[0]}, ${newValueArg.range[1]}]!`,
@@ -286,7 +286,7 @@ async function changeSetting(interaction, client, settingName, newSettingValue) 
     "\n"
   );
 
-  const getSettingDisplayValue = require("../../functions/getSettingDisplayValue.js");
+  const getSettingDisplayValue = require("../../functions/getSettingDisplayValue");
   return await interaction.followUp({
     content: `Changed \`${newValueArg.name.toLowerCase()}\` to \`${await getSettingDisplayValue(
       newValueArg,

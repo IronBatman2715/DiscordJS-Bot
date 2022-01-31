@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const GuildConfigModel = require("../resources/data/mongoModels/GuildConfig.js");
+const GuildConfigModel = require("../resources/data/mongoModels/GuildConfig");
 
 module.exports = class DB {
   constructor() {

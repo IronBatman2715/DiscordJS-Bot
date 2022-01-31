@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
-const Command = require("./Command.js");
-const logger = require("../functions/general/logger.js");
+const Command = require("./Command");
+const logger = require("../functions/general/logger");
 
 module.exports = class Client extends Discord.Client {
   /** @type {boolean} _ denotes protected */
@@ -34,12 +34,12 @@ module.exports = class Client extends Discord.Client {
     return this._commandTypes;
   }
 
-  /** Register bot and login */
+  /** Load bot scripts and login */
   start() {
     this.loadAndRegisterCommands();
     this.loadEvents();
 
-    const DB = require("./DB.js");
+    const DB = require("./DB");
     this.DB = new DB();
 
     console.log("*** DISCORD JS BOT: INITIALIZATION DONE ***");
@@ -211,7 +211,7 @@ module.exports = class Client extends Discord.Client {
     switch (command.type) {
       //Admin only commands
       case "admin": {
-        const isUser = require("../functions/discord/isUser.js");
+        const isUser = require("../functions/discord/isUser");
 
         if (
           !isUser(interaction.member, {
@@ -227,7 +227,7 @@ module.exports = class Client extends Discord.Client {
 
       //Developer only commands
       case "dev": {
-        const isUser = require("../functions/discord/isUser.js");
+        const isUser = require("../functions/discord/isUser");
 
         if (
           !isUser(interaction.member, {

@@ -1,5 +1,5 @@
 const { Guild } = require("discord.js");
-const settingsInfo = require("../resources/data/settingsInfo.js");
+const settingsInfo = require("../resources/data/settingsInfo");
 
 module.exports =
   /**
@@ -18,7 +18,7 @@ module.exports =
           return (await guild.channels.fetch(arg.value)).name;
         }
         case "defaultRepeatMode": {
-          const repeatModeEnum2Str = require("./music/repeatModeEnum2Str.js");
+          const repeatModeEnum2Str = require("./music/repeatModeEnum2Str");
           return repeatModeEnum2Str(arg.value);
         }
 

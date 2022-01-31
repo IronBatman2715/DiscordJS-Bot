@@ -1,5 +1,5 @@
-const Command = require("../../structures/Command.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
+const Command = require("../../structures/Command");
 
 module.exports = new Command(
   {
@@ -38,7 +38,7 @@ module.exports = new Command(
       case 1: {
         const [quantity] = args;
 
-        const isInRange = require("../../functions/general/isInRange.js");
+        const isInRange = require("../../functions/general/isInRange");
         if (!isInRange(quantity, 1, guildQueue.songs.length - 1)) {
           return await interaction.followUp({
             content: "Cannot skip as many or more songs than are in the queue!",

@@ -1,5 +1,5 @@
-const Client = require("../../structures/Client.js");
-const logger = require("../../functions/general/logger.js");
+const Client = require("../../structures/Client");
+const logger = require("../../functions/general/logger");
 
 module.exports =
   /** @param {Client} client */

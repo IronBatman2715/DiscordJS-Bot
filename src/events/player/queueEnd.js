@@ -1,5 +1,5 @@
 const { Queue } = require("discord-music-player");
-const Client = require("../../structures/Client.js");
+const Client = require("../../structures/Client");
 
 module.exports =
   /**

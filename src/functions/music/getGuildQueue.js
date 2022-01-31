@@ -1,7 +1,7 @@
 const { CommandInteraction } = require("discord.js");
 const { Queue } = require("discord-music-player");
-const Client = require("../../structures/Client.js");
-const QueueData = require("../../structures/QueueData.js");
+const Client = require("../../structures/Client");
+const QueueData = require("../../structures/QueueData");
 
 module.exports =
   /**

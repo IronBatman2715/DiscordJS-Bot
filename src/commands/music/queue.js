@@ -1,5 +1,5 @@
-const Command = require("../../structures/Command.js");
-const repeatModeEnum2Str = require("../../functions/music/repeatModeEnum2Str.js");
+const Command = require("../../structures/Command");
+const repeatModeEnum2Str = require("../../functions/music/repeatModeEnum2Str");
 
 module.exports = new Command(
   {

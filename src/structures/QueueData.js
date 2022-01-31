@@ -1,6 +1,6 @@
 const { CommandInteraction, Message } = require("discord.js");
-const Client = require("./Client.js");
 const { Song } = require("discord-music-player");
+const Client = require("./Client");
 
 module.exports = class QueueData {
   /** @type {Message} # denotes private */

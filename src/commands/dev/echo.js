@@ -1,5 +1,5 @@
-const Command = require("../../structures/Command.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
+const Command = require("../../structures/Command");
 
 module.exports = new Command(
   {

@@ -1,6 +1,6 @@
-const Client = require("./Client.js");
 const { CommandInteraction } = require("discord.js");
 const { RESTPostAPIApplicationCommandsJSONBody } = require("discord-api-types/v9");
+const Client = require("./Client");
 
 /**
  * @param {Client} client

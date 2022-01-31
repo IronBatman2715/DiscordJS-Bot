@@ -1,7 +1,7 @@
 const { MessageActionRow, MessageSelectMenu, MessageSelectOption } = require("discord.js");
-const Command = require("../../structures/Command.js");
-const isInRange = require("../../functions/general/isInRange.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
+const Command = require("../../structures/Command");
+const isInRange = require("../../functions/general/isInRange");
 
 module.exports = new Command(
   {

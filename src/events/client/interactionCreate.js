@@ -1,6 +1,6 @@
 const { Interaction, CommandInteractionOption } = require("discord.js");
-const Client = require("../../structures/Client.js");
-const Command = require("../../structures/Command.js");
+const Client = require("../../structures/Client");
+const Command = require("../../structures/Command");
 
 module.exports =
   /**

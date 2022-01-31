@@ -1,7 +1,7 @@
-const { RepeatMode } = require("discord-music-player");
-const Command = require("../../structures/Command.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
-const repeatModeEnum2Str = require("../../functions/music/repeatModeEnum2Str.js");
+const { RepeatMode } = require("discord-music-player");
+const Command = require("../../structures/Command");
+const repeatModeEnum2Str = require("../../functions/music/repeatModeEnum2Str");
 
 module.exports = new Command(
   {
