@@ -15,7 +15,6 @@ module.exports = new Command(
   {
     name: "settings",
     description: "ADMIN ONLY: Change/view guild settings.",
-    defaultPermission: false,
     options: [
       {
         name: "display",
@@ -121,6 +120,7 @@ module.exports = new Command(
 
         //User wants to reset settings
         case "reset": {
+          //Add in user confirmation..?
           return await resetSettings(interaction, client);
         }
 
@@ -144,8 +144,8 @@ module.exports = new Command(
       return await changeSetting(interaction, client, settingsOption, value);
     }
 
-    const [settingsOption, value] = args;
     //User entered a new value for this 2 argument setting
+    const [settingsOption, value] = args;
     return await changeSetting(interaction, client, settingsOption, value);
   }
 );
@@ -218,7 +218,11 @@ async function displayCurrentSettings(interaction, client) {
  */
 async function resetSettings(interaction, client) {
   try {
+    //Reset
     await client.DB.deleteGuildConfig(interaction.guildId);
+
+    //Generate new based on defaults
+    await client.DB.getGuildConfig(interaction.guildId);
 
     return await interaction.followUp({
       content: `Reset guild/server settings!`,
@@ -263,7 +267,7 @@ async function changeSetting(interaction, client, settingName, newSettingValue) 
   //If entry is a number, check if it is in allowed range
   if ((typeof newValueArg.value).toLowerCase() == "number" && newValueArg.range != []) {
     console.log("Checking if number is in range");
-    const isInRange = require("../../functions/isInRange.js");
+    const isInRange = require("../../functions/general/isInRange.js");
     if (!isInRange(newValueArg.value, newValueArg.range[0], newValueArg.range[1])) {
       return await interaction.followUp({
         content: `Entered value is out of allowed range: [${newValueArg.range[0]}, ${newValueArg.range[1]}]!`,

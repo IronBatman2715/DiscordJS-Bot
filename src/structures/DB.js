@@ -39,7 +39,7 @@ module.exports = class DB {
       switch (guildConfigSearch.length) {
         //Guild config document does not exist yet
         case 0: {
-          console.log("Guild config file not present. Generating one with the default values!");
+          console.log("Guild config document not present. Generating one with the default values!");
 
           //Create new
           const guildConfigDefault = new GuildConfigModel({
@@ -57,7 +57,7 @@ module.exports = class DB {
         }
 
         default: {
-          console.log(`Found multiple config files for a server [guilId: ${guildId}]!`);
+          console.log(`Found multiple config documents for a server [guilId: ${guildId}]!`);
         }
       }
     } catch (error) {

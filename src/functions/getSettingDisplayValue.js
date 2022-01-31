@@ -18,7 +18,7 @@ module.exports =
           return (await guild.channels.fetch(arg.value)).name;
         }
         case "defaultRepeatMode": {
-          const repeatModeEnum2Str = require("./repeatModeEnum2Str.js");
+          const repeatModeEnum2Str = require("./music/repeatModeEnum2Str.js");
           return repeatModeEnum2Str(arg.value);
         }
 

@@ -1,6 +1,6 @@
 const Command = require("../../structures/Command.js");
-const tempMessage = require("../../functions/tempMessage.js");
-const isInRange = require("../../functions/isInRange.js");
+const tempMessage = require("../../functions/discord/tempMessage.js");
+const isInRange = require("../../functions/general/isInRange.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 
 module.exports = new Command(

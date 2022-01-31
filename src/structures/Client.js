@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const Command = require("./Command.js");
-const log = require("../functions/log.js");
+const log = require("../functions/general/log.js");
 
 module.exports = class Client extends Discord.Client {
   constructor() {
@@ -176,7 +176,7 @@ module.exports = class Client extends Discord.Client {
     switch (command.type) {
       //Admin only commands
       case "admin": {
-        const isUser = require("../functions/isUser.js");
+        const isUser = require("../functions/discord/isUser.js");
 
         if (
           !isUser(interaction.member, {
@@ -192,7 +192,7 @@ module.exports = class Client extends Discord.Client {
 
       //Developer only commands
       case "dev": {
-        const isUser = require("../functions/isUser.js");
+        const isUser = require("../functions/discord/isUser.js");
 
         if (
           !isUser(interaction.member, {

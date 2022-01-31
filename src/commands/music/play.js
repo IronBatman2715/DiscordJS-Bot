@@ -1,6 +1,6 @@
 const Command = require("../../structures/Command.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
-const getGuildQueue = require("../../functions/getGuildQueue.js");
+const getGuildQueue = require("../../functions/music/getGuildQueue.js");
 
 module.exports = new Command(
   "music",
