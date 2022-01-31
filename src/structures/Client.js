@@ -20,7 +20,6 @@ module.exports = class Client extends Discord.Client {
   start() {
     this.registerCommands();
     this.registerEvents();
-    this.registerPlayerEvents();
 
     const DB = require("./DB.js");
     this.DB = new DB();
@@ -100,48 +99,57 @@ module.exports = class Client extends Discord.Client {
     })();
   }
 
-  /** Register discord events */
+  /** Register events */
   registerEvents() {
     console.log("Events:");
-
     const { readdirSync } = require("fs");
-    readdirSync("./src/events")
+
+    //Discord client
+    console.log("\tClient:");
+    readdirSync("./src/events/client")
       .filter((file) => file.endsWith(".js"))
-      .forEach(
-        /** @param {string} file */
-        (file) => {
-          const eventName = file.slice(0, file.length - 3);
-          const eventFunction = require(`../events/${file}`);
+      .forEach((file) => {
+        const eventName = file.slice(0, file.length - 3);
+        const eventFunction = require(`../events/client/${file}`);
 
-          //Tie to this instance
-          this.on(eventName, eventFunction.bind(null, this));
+        //Tie to this instance
+        this.on(eventName, eventFunction.bind(null, this));
 
-          console.log(`\t${eventName}`);
-        }
-      );
-  }
+        console.log(`\t\t${eventName}`);
+      });
 
-  /** Register discord music player events */
-  registerPlayerEvents() {
-    console.log("Player Events:");
+    //Mongoose
+    console.log("\tMongo:");
+    const mongoose = require("mongoose");
+    readdirSync("./src/events/mongo")
+      .filter((file) => file.endsWith(".js"))
+      .forEach((file) => {
+        const eventName = file.slice(0, file.length - 3);
+        const eventFunction = require(`../events/mongo/${file}`);
+
+        //Tie to this mongoose instance
+        mongoose.connection.on(eventName, (...args) => eventFunction(...args));
+
+        console.log(`\t\t${eventName}`);
+      });
+
+    //Discord music player
+    console.log("\tPlayer:");
     const { Player } = require("discord-music-player");
     const PlayerEvent = require("./PlayerEvent.js");
-
     this.player = new Player(this, {
       deafenOnJoin: true,
     });
-    const { readdirSync } = require("fs");
-    readdirSync("./src/playerEvents")
+    readdirSync("./src/events/player")
       .filter((file) => file.endsWith(".js"))
       .forEach((file) => {
-        /** @type {string} */
-        const playerEventName = file.slice(0, file.length - 3);
-        /**
-         * @type {PlayerEvent}
-         */
-        const playerEvent = require(`../playerEvents/${file}`);
-        this.player.on(playerEventName, playerEvent.runFunction.bind(null, this));
-        console.log(`\t${playerEventName}`);
+        const eventName = file.slice(0, file.length - 3);
+        /** @type {PlayerEvent} */
+        const playerEvent = require(`../events/player/${file}`);
+
+        this.player.on(eventName, playerEvent.runFunction.bind(null, this));
+
+        console.log(`\t\t${eventName}`);
       });
   }
 

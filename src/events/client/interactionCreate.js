@@ -1,6 +1,6 @@
 const { Interaction, CommandInteractionOption } = require("discord.js");
-const Client = require("../structures/Client.js");
-const Command = require("../structures/Command.js");
+const Client = require("../../structures/Client.js");
+const Command = require("../../structures/Command.js");
 
 module.exports =
   /**
@@ -54,7 +54,7 @@ module.exports =
             .filter((file) => file.endsWith(".js"))
             .forEach((file) => {
               /** @type {Command} */
-              const command = require(`../commands/${dir}/${file}`);
+              const command = require(`../../commands/${dir}/${file}`);
               //console.log("command.data.options: ", command.data.options);
 
               let extraArgumentsEntry = "";

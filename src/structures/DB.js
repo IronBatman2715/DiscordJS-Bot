@@ -3,21 +3,6 @@ const GuildConfigModel = require("../resources/data/mongoModels/GuildConfig.js")
 
 module.exports = class DB {
   constructor() {
-    console.log("MongoDB:");
-
-    const { readdirSync } = require("fs");
-    readdirSync("./src/mongoEvents")
-      .filter((file) => file.endsWith(".js"))
-      .forEach((file) => {
-        /** @type {string} */
-        const mongoEventName = file.slice(0, file.length - 3);
-
-        const mongoEvent = require(`../mongoEvents/${file}`);
-
-        mongoose.connection.on(mongoEventName, (...args) => mongoEvent(...args));
-        console.log(`\t${mongoEventName}`);
-      });
-
     mongoose.connect(process.env.DB_TOKEN, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

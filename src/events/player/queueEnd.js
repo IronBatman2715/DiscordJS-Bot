@@ -1,5 +1,5 @@
-const Client = require("../structures/Client.js");
-const PlayerEvent = require("../structures/PlayerEvent.js");
+const Client = require("../../structures/Client.js");
+const PlayerEvent = require("../../structures/PlayerEvent.js");
 const { Queue } = require("discord-music-player");
 
 module.exports = new PlayerEvent(
@@ -8,7 +8,7 @@ module.exports = new PlayerEvent(
    * @param {Queue} queue
    */
   async (client, queue) => {
-    console.log("DMP.PlayerEvents:queueDestroyed => Queue destroyed!");
+    console.log("DMP.PlayerEvents:queueEnd => Queue ended!");
 
     await queue.data.deleteEmbedMessage();
   }

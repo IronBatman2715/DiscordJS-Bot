@@ -1,7 +1,7 @@
 const { Queue, Song } = require("discord-music-player");
-const Client = require("../structures/Client.js");
-const PlayerEvent = require("../structures/PlayerEvent.js");
-const tempMessage = require("../functions/discord/tempMessage.js");
+const Client = require("../../structures/Client.js");
+const PlayerEvent = require("../../structures/PlayerEvent.js");
+const tempMessage = require("../../functions/discord/tempMessage.js");
 
 module.exports = new PlayerEvent(
   /**

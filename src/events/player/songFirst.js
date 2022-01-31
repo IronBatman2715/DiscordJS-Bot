@@ -1,5 +1,5 @@
-const Client = require("../structures/Client.js");
-const PlayerEvent = require("../structures/PlayerEvent.js");
+const Client = require("../../structures/Client.js");
+const PlayerEvent = require("../../structures/PlayerEvent.js");
 const { Queue, Song } = require("discord-music-player");
 
 module.exports = new PlayerEvent(
