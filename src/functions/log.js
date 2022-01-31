@@ -1,6 +1,7 @@
-module.exports =
-  /** @param {string} msg */
-  (msg) => {
-    //const util = require("util");
-    process.stdout.write(msg);
-  };
+module.exports = (...entries) => {
+  entries.forEach((entry) => {
+    if (typeof entry !== "string") entry = entry.toString();
+
+    process.stdout.write(entry);
+  });
+};
