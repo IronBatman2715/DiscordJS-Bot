@@ -3,7 +3,10 @@ const Command = require("./Command.js");
 const logger = require("../functions/general/logger.js");
 
 module.exports = class Client extends Discord.Client {
-  constructor() {
+  /**
+   * @param {boolean} devMode Set true to register developer commands to the discord server corresponding to environment variable `TEST_GUILD_ID`
+   */
+  constructor(devMode) {
     console.log("*** DISCORD JS BOT: INITIALIZATION ***");
 
     super({
@@ -13,7 +16,10 @@ module.exports = class Client extends Discord.Client {
 
     this.config = require("../resources/data/config.json"); //universal bot configs
 
-    console.log("Loading ", this.config.name);
+    /** @type {boolean} */
+    this._devMode = devMode;
+
+    console.log(`Loading ${this.config.name}: ${this._devMode ? "DEV" : "PRODUCTION"} MODE`);
   }
 
   /** Register bot and login */
@@ -34,8 +40,6 @@ module.exports = class Client extends Discord.Client {
   registerCommands() {
     console.log("Commands:");
 
-    const devMode = true; //SET TO FALSE TO REGISTER NON-DEV COMMANDS TO GLOBAL
-
     this.commands = new Discord.Collection();
     let commandDataArr = [];
     const { readdirSync } = require("fs");
@@ -53,7 +57,7 @@ module.exports = class Client extends Discord.Client {
               console.log("Improper type assigned to command: ", command.data.name);
             }
 
-            if (command.type == "dev" && !devMode) {
+            if (command.type == "dev" && !this._devMode) {
               //do NOT register this command
             } else {
               this.commands.set(command.data.name, command);
@@ -75,7 +79,7 @@ module.exports = class Client extends Discord.Client {
       try {
         logger("Registering commands with DiscordAPI...");
 
-        if (devMode) {
+        if (this._devMode) {
           //Instantly register to test guild
           logger(` DEV MODE. ONLY REGISTERING IN "TEST_GUILD_ID" FROM .ENV\n`);
           //rest.delete();
