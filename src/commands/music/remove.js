@@ -4,7 +4,6 @@ const isInRange = require("../../functions/general/isInRange.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 
 module.exports = new Command(
-  "music",
   {
     name: "remove",
     description: "Remove a song from music queue.",

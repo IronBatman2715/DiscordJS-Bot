@@ -2,7 +2,6 @@ const Command = require("../../structures/Command.js");
 const repeatModeEnum2Str = require("../../functions/music/repeatModeEnum2Str.js");
 
 module.exports = new Command(
-  "music",
   {
     name: "queue",
     description: "Display music queue.",
@@ -29,14 +28,13 @@ module.exports = new Command(
       return interaction.followUp({ content: "No songs in queue!" });
     }
 
-    let queueFieldArr = [];
-    for (let i = 0; i < guildQueue.songs.length; i++) {
-      queueFieldArr[i] = {
-        name: `${i + 1}: [${guildQueue.songs[i].name}] (${guildQueue.songs[i].url})`,
-        value: `by: ${guildQueue.songs[i].author}\nrequested by: ${guildQueue.songs[i].requestedBy}\n`,
+    let queueFieldArr = guildQueue.songs.map((song, i) => {
+      return {
+        name: `${i + 1}: [${song.name}] (${song.url})`,
+        value: `by: ${song.author}\nrequested by: ${song.requestedBy}\n`,
         inline: false,
       };
-    }
+    });
 
     let repeatModeStr = repeatModeEnum2Str(guildQueue.repeatMode);
     repeatModeStr = repeatModeStr[0].toUpperCase() + repeatModeStr.slice(1).toLowerCase();

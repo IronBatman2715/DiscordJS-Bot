@@ -3,7 +3,6 @@ const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 const getGuildQueue = require("../../functions/music/getGuildQueue.js");
 
 module.exports = new Command(
-  "music",
   {
     name: "playlist",
     description: "Plays a playlist or adds it to the end of the music queue.",

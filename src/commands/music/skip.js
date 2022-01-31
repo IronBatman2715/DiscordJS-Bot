@@ -2,7 +2,6 @@ const Command = require("../../structures/Command.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 
 module.exports = new Command(
-  "music",
   {
     name: "skip",
     description: "Skip a number of song(s) [default: 1].",

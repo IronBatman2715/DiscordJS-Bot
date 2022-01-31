@@ -2,7 +2,6 @@ const { MessageEmbed } = require("discord.js");
 const Command = require("../../structures/Command.js");
 
 module.exports = new Command(
-  "dev",
   {
     name: "embed",
     description: "DEV ONLY: Shows a test embed.",

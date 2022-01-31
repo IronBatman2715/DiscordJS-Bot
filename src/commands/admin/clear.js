@@ -4,11 +4,10 @@ const isInRange = require("../../functions/general/isInRange.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 
 module.exports = new Command(
-  "admin",
   {
     name: "clear",
     description: "ADMIN ONLY: Clear messages from the text channel!",
-    defaultPermission: false,
+    //default_permission: false,
     options: [
       {
         name: "quantity",

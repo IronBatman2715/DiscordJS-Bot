@@ -1,9 +1,7 @@
-const { readdirSync } = require("fs");
 const { MessageSelectOption, MessageActionRow, MessageSelectMenu } = require("discord.js");
 const Command = require("../../structures/Command.js");
 
 module.exports = new Command(
-  "general",
   {
     name: "help",
     description: "Shows a list of available commands.",
@@ -11,15 +9,14 @@ module.exports = new Command(
 
   async (client, interaction, args) => {
     /** @type {MessageSelectOption[]} */
-    let commandCategories = [];
-    readdirSync("./src/commands").forEach((folder) => {
-      if (folder != "dev") {
-        commandCategories.push({
-          label: folder[0].toUpperCase() + folder.slice(1),
-          value: folder,
-        });
-      }
-    });
+    const commandCategories = client.commandTypes
+      .filter((type) => type !== "dev")
+      .map((type) => {
+        return {
+          label: type[0].toUpperCase() + type.slice(1),
+          value: type,
+        };
+      });
 
     const row = new MessageActionRow({
       components: [

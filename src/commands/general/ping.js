@@ -1,7 +1,6 @@
 const Command = require("../../structures/Command.js");
 
 module.exports = new Command(
-  "general",
   {
     name: "ping",
     description: "Shows the ping of the bot.",

@@ -1,7 +1,6 @@
 const Command = require("../../structures/Command.js");
 
 module.exports = new Command(
-  "general",
   {
     name: "hello",
     description: "Replies with a greeting!",

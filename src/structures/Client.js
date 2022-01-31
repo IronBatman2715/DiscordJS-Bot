@@ -3,6 +3,11 @@ const Command = require("./Command.js");
 const logger = require("../functions/general/logger.js");
 
 module.exports = class Client extends Discord.Client {
+  /** @type {boolean} _ denotes protected */
+  _devMode;
+  /** @type {string[]} _ denotes protected */
+  _commandTypes;
+
   /**
    * @param {boolean} devMode Set true to register developer commands to the discord server corresponding to environment variable `TEST_GUILD_ID`
    */
@@ -16,16 +21,23 @@ module.exports = class Client extends Discord.Client {
 
     this.config = require("../resources/data/config.json"); //universal bot configs
 
-    /** @type {boolean} */
     this._devMode = devMode;
 
     console.log(`Loading ${this.config.name}: ${this._devMode ? "DEV" : "PRODUCTION"} MODE`);
   }
 
+  get devMode() {
+    return this._devMode;
+  }
+
+  get commandTypes() {
+    return this._commandTypes;
+  }
+
   /** Register bot and login */
   start() {
-    this.registerCommands();
-    this.registerEvents();
+    this.loadAndRegisterCommands();
+    this.loadEvents();
 
     const DB = require("./DB.js");
     this.DB = new DB();
@@ -36,40 +48,52 @@ module.exports = class Client extends Discord.Client {
     this.login(process.env.TOKEN);
   }
 
-  /** Register slash commands */
-  registerCommands() {
+  /** Load slash commands */
+  loadCommands() {
     console.log("Commands:");
 
+    /** @type {Discord.Collection<string, Command>} */
     this.commands = new Discord.Collection();
+
+    this._commandTypes = [];
+
+    const { RESTPostAPIApplicationCommandsJSONBody } = require("discord-api-types/v9");
+    /** @type {RESTPostAPIApplicationCommandsJSONBody[]} */
     let commandDataArr = [];
+
     const { readdirSync } = require("fs");
     readdirSync("./src/commands").forEach((folder) => {
       console.log(`\t${folder}`);
       readdirSync(`./src/commands/${folder}`)
         .filter((file) => file.endsWith(".js"))
-        .forEach(
-          /** @param {string} file */
-          (file) => {
-            /** @type {Command} */
-            const command = require(`../commands/${folder}/${file}`);
+        .forEach((file) => {
+          /** @type {Command} */
+          const command = require(`../commands/${folder}/${file}`);
 
-            if (command.type != folder) {
-              console.log("Improper type assigned to command: ", command.data.name);
-            }
-
-            if (command.type == "dev" && !this._devMode) {
-              //do NOT register this command
-            } else {
-              this.commands.set(command.data.name, command);
-              commandDataArr.push(command.data);
-
-              console.log(`\t\t${command.data.name}`);
-            }
+          //Set and store command types
+          command.setType(folder);
+          if (!this.commandTypes.includes(folder)) {
+            this._commandTypes.push(folder);
           }
-        );
+
+          if (command.type == "dev" && !this.devMode) {
+            //do NOT register this command
+          } else {
+            this.commands.set(command.data.name, command);
+            commandDataArr.push(command.data);
+
+            console.log(`\t\t${command.data.name}`);
+          }
+        });
     });
 
-    //Register with DiscordAPI
+    return commandDataArr;
+  }
+
+  //Load command files and then register with DiscordAPI
+  loadAndRegisterCommands() {
+    const commandDataArr = this.loadCommands();
+
     const { REST } = require("@discordjs/rest");
     const { Routes } = require("discord-api-types/v9");
 
@@ -79,7 +103,7 @@ module.exports = class Client extends Discord.Client {
       try {
         logger("Registering commands with DiscordAPI...");
 
-        if (this._devMode) {
+        if (this.devMode) {
           //Instantly register to test guild
           logger(` DEV MODE. ONLY REGISTERING IN "TEST_GUILD_ID" FROM .ENV\n`);
           //rest.delete();
@@ -103,8 +127,8 @@ module.exports = class Client extends Discord.Client {
     })();
   }
 
-  /** Register events */
-  registerEvents() {
+  /** Load events */
+  loadEvents() {
     console.log("Events:");
     const { readdirSync } = require("fs");
 

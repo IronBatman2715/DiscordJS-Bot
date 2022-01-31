@@ -4,7 +4,6 @@ const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 const repeatModeEnum2Str = require("../../functions/music/repeatModeEnum2Str.js");
 
 module.exports = new Command(
-  "music",
   {
     name: "repeat",
     description: "Set the repeat mode of the music queue.",

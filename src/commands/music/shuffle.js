@@ -1,7 +1,6 @@
 const Command = require("../../structures/Command.js");
 
 module.exports = new Command(
-  "music",
   {
     name: "shuffle",
     description: "Shuffles the songs currently in the music queue.",

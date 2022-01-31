@@ -1,7 +1,6 @@
 const Command = require("../../structures/Command.js");
 
 module.exports = new Command(
-  "music",
   {
     name: "stop",
     description: "Stops playing music.",

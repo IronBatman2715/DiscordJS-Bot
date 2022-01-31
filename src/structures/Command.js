@@ -1,5 +1,6 @@
 const Client = require("./Client.js");
-const { CommandInteraction, ApplicationCommand } = require("discord.js");
+const { CommandInteraction } = require("discord.js");
+const { RESTPostAPIApplicationCommandsJSONBody } = require("discord-api-types/v9");
 
 /**
  * @param {Client} client
@@ -9,14 +10,24 @@ const { CommandInteraction, ApplicationCommand } = require("discord.js");
 async function RunFunction(client, interaction, args) {}
 
 module.exports = class Command {
+  /** @type {string} _ denotes protected */
+  _type;
+
   /**
-   * @param {string} type
-   * @param {ApplicationCommand} data
+   * @param {RESTPostAPIApplicationCommandsJSONBody} data
    * @param {RunFunction} run
    */
-  constructor(type, data, run) {
-    this.type = type;
+  constructor(data, run) {
     this.data = data;
     this.run = run;
+  }
+
+  /** @param {string} type */
+  setType(type) {
+    this._type = type;
+  }
+
+  get type() {
+    return this._type;
   }
 };

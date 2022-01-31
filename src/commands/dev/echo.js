@@ -2,7 +2,6 @@ const Command = require("../../structures/Command.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v9");
 
 module.exports = new Command(
-  "dev",
   {
     name: "echo",
     description: "DEV ONLY: Repeats a message back to you!",

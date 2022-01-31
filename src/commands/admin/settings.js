@@ -11,10 +11,10 @@ const { RepeatMode } = require("discord-music-player");
 const settingsInfo = require("../../resources/data/settingsInfo.js");
 
 module.exports = new Command(
-  "admin",
   {
     name: "settings",
     description: "ADMIN ONLY: Change/view guild settings.",
+    //default_permission: false,
     options: [
       {
         name: "display",

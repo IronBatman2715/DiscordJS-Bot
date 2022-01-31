@@ -3,7 +3,6 @@ const Command = require("../../structures/Command.js");
 const isInRange = require("../../functions/general/isInRange.js");
 
 module.exports = new Command(
-  "general",
   {
     name: "roll",
     description: "Roll the dice!",

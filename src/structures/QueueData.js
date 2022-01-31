@@ -3,7 +3,7 @@ const Client = require("./Client.js");
 const { Song } = require("discord-music-player");
 
 module.exports = class QueueData {
-  /** @type {Message} */
+  /** @type {Message} # denotes private */
   #embedMessage;
 
   /**
@@ -15,7 +15,7 @@ module.exports = class QueueData {
     this.latestInteraction = initialInteraction;
   }
 
-  async getEmbedMessage() {
+  get embedMessage() {
     return this.#embedMessage;
   }
 
@@ -65,9 +65,7 @@ module.exports = class QueueData {
           str = "more than one embed!";
           break;
       }
-      return console.error(
-        `Error => QueueData.setEmbedMessage: newEmbedMessage has ${str}`
-      );
+      return console.error(`Error => QueueData.setEmbedMessage: newEmbedMessage has ${str}`);
     }
 
     await this.deleteEmbedMessage();
@@ -78,8 +76,8 @@ module.exports = class QueueData {
 
   async deleteEmbedMessage() {
     try {
-      if (!!this.#embedMessage) {
-        await this.#embedMessage.delete();
+      if (!!this.embedMessage) {
+        await this.embedMessage.delete();
       }
     } catch (error) {
       console.error(error);
