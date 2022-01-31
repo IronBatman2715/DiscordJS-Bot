@@ -23,6 +23,11 @@ module.exports = class Client extends Discord.Client {
 
     this._devMode = devMode;
 
+    const { Player } = require("discord-music-player");
+    this.player = new Player(this, {
+      deafenOnJoin: true,
+    });
+
     console.log(`Loading ${this.config.name}: ${this._devMode ? "DEV" : "PRODUCTION"} MODE`);
   }
 
@@ -156,17 +161,13 @@ module.exports = class Client extends Discord.Client {
         const eventFunction = require(`../events/mongo/${file}`);
 
         //Tie to this mongoose instance
-        mongoose.connection.on(eventName, (...args) => eventFunction(this, ...args));
+        mongoose.connection.on(eventName, eventFunction.bind(null, this));
 
         console.log(`\t\t${eventName}`);
       });
 
     //Discord music player
     console.log("\tPlayer:");
-    const { Player } = require("discord-music-player");
-    this.player = new Player(this, {
-      deafenOnJoin: true,
-    });
     readdirSync("./src/events/player")
       .filter((file) => file.endsWith(".js"))
       .forEach((file) => {

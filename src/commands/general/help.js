@@ -1,5 +1,6 @@
 const { MessageSelectOption, MessageActionRow, MessageSelectMenu } = require("discord.js");
 const Command = require("../../structures/Command");
+const capitalize = require("../../functions/general/capitalize");
 
 module.exports = new Command(
   {
@@ -13,7 +14,7 @@ module.exports = new Command(
       .filter((type) => type !== "dev")
       .map((type) => {
         return {
-          label: type[0].toUpperCase() + type.slice(1),
+          label: capitalize(type),
           value: type,
         };
       });

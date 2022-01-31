@@ -1,4 +1,5 @@
 const Command = require("../../structures/Command");
+const capitalize = require("../../functions/general/capitalize");
 const repeatModeEnum2Str = require("../../functions/music/repeatModeEnum2Str");
 
 module.exports = new Command(
@@ -36,8 +37,7 @@ module.exports = new Command(
       };
     });
 
-    let repeatModeStr = repeatModeEnum2Str(guildQueue.repeatMode);
-    repeatModeStr = repeatModeStr[0].toUpperCase() + repeatModeStr.slice(1).toLowerCase();
+    const repeatModeStr = capitalize(repeatModeEnum2Str(guildQueue.repeatMode));
 
     const queueEmbed = client.genEmbed({
       title: `Music Queue (${guildQueue.songs.length} song${
