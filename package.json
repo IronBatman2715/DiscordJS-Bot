@@ -1,19 +1,17 @@
 {
-  "name": "discord-bot",
   "main": "src/index.js",
+  "name": "discordjs-bot",
+  "author": "IronBatman2715",
   "scripts": {
     "serve": "node .",
     "dev": "nodemon ."
   },
   "license": "MIT",
   "dependencies": {
-    "@discordjs/opus": "^0.5.3",
     "@discordjs/rest": "^0.3.0",
-    "discord-api-types": "^0.26.1",
     "discord-music-player": "^8.3.1",
     "discord.js": "^13.6.0",
     "dotenv": "^14.3.2",
-    "ffmpeg-static": "^4.4.1",
     "mongoose": "^6.1.8"
   },
   "devDependencies": {
