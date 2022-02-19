@@ -1,66 +1,66 @@
 const { Interaction, CommandInteractionOption } = require("discord.js");
+
 const Client = require("../../structures/Client");
 const Command = require("../../structures/Command");
 
-module.exports =
-  /**
-   * @param {Client} client
-   * @param {Interaction} interaction
-   */
-  async (client, interaction) => {
-    if (interaction.isCommand()) {
-      //console.log("CommandInteraction created!");
+/**
+ * @param {Client} client
+ * @param {Interaction} interaction
+ */
+module.exports = async (client, interaction) => {
+  if (interaction.isCommand()) {
+    //console.log("CommandInteraction created!");
 
-      //Show user that command is loading
-      await interaction.deferReply().catch((error) => {
-        console.error(error);
-      });
+    //Show user that command is loading
+    await interaction.deferReply().catch((error) => {
+      console.error(error);
+    });
 
-      /** @type {Command} */
-      const command = client.commands.get(interaction.commandName);
+    /** @type {Command} */
+    const command = client.commands.get(interaction.commandName);
 
-      if (!command) return;
+    if (!command) return;
 
-      const args = [];
-      //console.log("interaction.options.data: ", interaction.options.data);
-      interaction.options.data.map((option) => parseArgs(option, args));
-      console.log("args: ", args);
+    const args = [];
+    //console.log("interaction.options.data: ", interaction.options.data);
+    interaction.options.data.map((option) => parseArgs(option, args));
+    console.log("args: ", args);
 
-      await client.runCommand(command, interaction, args);
-    } else if (interaction.isSelectMenu()) {
-      //console.log("SelectMenuInteraction created!");
-      //console.log("values selected: ", interaction.values);
+    await client.runCommand(command, interaction, args);
+  } else if (interaction.isSelectMenu()) {
+    //console.log("SelectMenuInteraction created!");
+    //console.log("values selected: ", interaction.values);
 
-      //Show user that command is loading
-      await interaction.deferUpdate().catch((error) => {
-        console.error(error);
-      });
+    //Show user that command is loading
+    await interaction.deferUpdate().catch((error) => {
+      console.error(error);
+    });
 
-      switch (interaction.customId) {
-        case `${client.config.name}-help-select-menu`: {
-          const [dir] = interaction.values;
+    switch (interaction.customId) {
+      case `${client.config.name}-help-select-menu`: {
+        const [dir] = interaction.values;
 
-          const helpEmbed = client.genEmbed();
+        const helpEmbed = client.genEmbed();
 
-          /** @type {EmbedFieldData[]} */
-          let commandObjArr = [];
-          let commandIndex = 0;
-          const dirName = dir[0].toUpperCase() + dir.slice(1);
+        /** @type {EmbedFieldData[]} */
+        let commandObjArr = [];
+        let commandIndex = 0;
+        const dirName = dir[0].toUpperCase() + dir.slice(1);
 
-          helpEmbed.setTitle(`${dirName} Commands`);
+        helpEmbed.setTitle(`${dirName} Commands`);
 
-          const { readdirSync } = require("fs");
-          readdirSync(`./src/commands/${dir}`)
-            .filter((file) => file.endsWith(".js"))
-            .forEach((file) => {
-              /** @type {Command} */
-              const command = require(`../../commands/${dir}/${file}`);
-              //console.log("command.data.options: ", command.data.options);
+        const { readdirSync } = require("fs");
+        readdirSync(`./src/commands/${dir}`)
+          .filter((file) => file.endsWith(".js"))
+          .forEach((file) => {
+            /** @type {Command} */
+            const command = require(`../../commands/${dir}/${file}`);
+            //console.log("command.data.options: ", command.data.options);
 
-              let extraArgumentsEntry = "";
+            let extraArgumentsEntry = "";
 
-              let permissionsEntry = "";
-              /*if (command.permissions.length > 0) {
+            let permissionsEntry = "";
+            /*if (command.permissions.length > 0) {
                 permissionsEntry = "\n**Permission";
                 if (command.permissions.length > 1) {
                   permissionsEntry = permissionsEntry + "s";
@@ -77,26 +77,26 @@ module.exports =
                 permissionsEntry = permissionsEntry + "**";
                 }*/
 
-              commandObjArr[commandIndex] = {
-                name: `\`/${command.data.name}${extraArgumentsEntry}\``,
-                value: `${command.data.description}${permissionsEntry}`,
-                inline: true,
-              };
+            commandObjArr[commandIndex] = {
+              name: `\`/${command.data.name}${extraArgumentsEntry}\``,
+              value: `${command.data.description}${permissionsEntry}`,
+              inline: true,
+            };
 
-              commandIndex++;
-            });
+            commandIndex++;
+          });
 
-          helpEmbed.setFields(commandObjArr);
+        helpEmbed.setFields(commandObjArr);
 
-          return await interaction.editReply({ embeds: [helpEmbed] });
-        }
+        return await interaction.editReply({ embeds: [helpEmbed] });
+      }
 
-        default: {
-          return console.log("Could not match customId of select menu to one of this bot's!");
-        }
+      default: {
+        return console.log("Could not match customId of select menu to one of this bot's!");
       }
     }
-  };
+  }
+};
 
 /**
  * @param {CommandInteractionOption} option

@@ -1,3 +1,6 @@
+/**
+ * @param  {...any} entries
+ */
 module.exports = (...entries) => {
   entries.forEach((entry) => {
     if (typeof entry !== "string") entry = entry.toString();

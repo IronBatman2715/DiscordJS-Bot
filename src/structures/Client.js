@@ -1,8 +1,16 @@
-const Discord = require("discord.js");
+const DiscordClient = require("discord.js").Client;
+const {
+  Collection,
+  CommandInteraction,
+  Intents,
+  MessageEmbed,
+  MessageEmbedOptions,
+  Permissions,
+} = require("discord.js");
 const Command = require("./Command");
 const logger = require("../functions/general/logger");
 
-module.exports = class Client extends Discord.Client {
+module.exports = class Client extends DiscordClient {
   /** @type {boolean} _ denotes protected */
   _devMode;
   /** @type {string[]} _ denotes protected */
@@ -15,10 +23,14 @@ module.exports = class Client extends Discord.Client {
     console.log("*** DISCORD JS BOT: INITIALIZATION ***");
 
     super({
-      intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_VOICE_STATES],
+      intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES],
       allowedMentions: { repliedUser: false },
     });
 
+    /**
+     * @typedef {{type: string; name: string}} ActivitesOptions
+     * @type {{name: string; activities: ActivitesOptions[]}}
+     */
     this.config = require("../resources/data/config.json"); //universal bot configs
 
     this._devMode = devMode;
@@ -28,7 +40,17 @@ module.exports = class Client extends Discord.Client {
       deafenOnJoin: true,
     });
 
+    //Load scripts
     console.log(`Loading ${this.config.name}: ${this._devMode ? "DEV" : "PRODUCTION"} MODE`);
+
+    const commandDataArr = this.loadCommands();
+    if (this.devMode) this.registerCommands(commandDataArr);
+    this.loadEvents();
+
+    const DB = require("./DB");
+    this.DB = new DB();
+
+    console.log("*** DISCORD JS BOT: INITIALIZATION DONE ***");
   }
 
   get devMode() {
@@ -39,26 +61,18 @@ module.exports = class Client extends Discord.Client {
     return this._commandTypes;
   }
 
-  /** Load bot scripts and login */
-  start() {
-    this.loadAndRegisterCommands();
-    this.loadEvents();
-
-    const DB = require("./DB");
-    this.DB = new DB();
-
-    console.log("*** DISCORD JS BOT: INITIALIZATION DONE ***");
-
+  /** Login to Discord API */
+  async start() {
     logger("Logging in... ");
-    this.login(process.env.TOKEN);
+    await this.login(process.env.TOKEN);
   }
 
   /** Load slash commands */
   loadCommands() {
     console.log("Commands:");
 
-    /** @type {Discord.Collection<string, Command>} */
-    this.commands = new Discord.Collection();
+    /** @type {Collection<string, Command>} */
+    this.commands = new Collection();
 
     this._commandTypes = [];
 
@@ -95,10 +109,11 @@ module.exports = class Client extends Discord.Client {
     return commandDataArr;
   }
 
-  //Load command files and then register with DiscordAPI
-  loadAndRegisterCommands() {
-    const commandDataArr = this.loadCommands();
-
+  /** Register commands with Discord API
+   * @param {RESTPostAPIApplicationCommandsJSONBody[]} commandDataArr
+   * @param {string} scope Set to `"global"` to globally register commands. Otherwise, defaults to environment variable `TEST_GUILD_ID`
+   */
+  registerCommands(commandDataArr, scope = "") {
     const { REST } = require("@discordjs/rest");
     const { Routes } = require("discord-api-types/v9");
 
@@ -106,30 +121,47 @@ module.exports = class Client extends Discord.Client {
 
     (async () => {
       try {
-        logger("Registering commands with DiscordAPI...");
+        logger("Registering commands with Discord API...");
 
-        if (this.devMode) {
+        if (scope === "global") {
+          //Register globally, will take a few minutes to register changes
+          logger(" PRODUCTION MODE. Registering to any server this bot is in\n");
+
+          await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+            body: commandDataArr,
+          });
+        } else {
           //Instantly register to test guild
-          logger(` DEV MODE. ONLY REGISTERING IN "TEST_GUILD_ID" FROM .ENV\n`);
-          //rest.delete();
+          logger(` DEV MODE. Only registering in "TEST_GUILD_ID" environment variable\n`);
+
           await rest.put(
             Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.TEST_GUILD_ID),
             {
               body: commandDataArr,
             }
           );
-        } else {
-          //Register globally, will take a few minutes to register changes
-
-          logger(" DISTRIBUTION MODE. REGISTERING TO ANY SERVER THIS BOT IS IN\n");
-          await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
-            body: commandDataArr,
-          });
         }
       } catch (error) {
         console.error(error);
       }
     })();
+  }
+
+  async clearGlobalCommands() {
+    const { REST } = require("@discordjs/rest");
+    const { Routes } = require("discord-api-types/v9");
+
+    const rest = new REST({ version: "9" }).setToken(process.env.TOKEN);
+
+    try {
+      logger("Clearing global commands from Discord API...");
+
+      await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
+        body: [],
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   /** Load events */
@@ -181,11 +213,11 @@ module.exports = class Client extends Discord.Client {
   }
 
   /**
-   * @param {Discord.MessageEmbedOptions} data
+   * @param {MessageEmbedOptions} data
    * @returns {MessageEmbed}
    */
   genEmbed(data = {}) {
-    const embed = new Discord.MessageEmbed(data);
+    const embed = new MessageEmbed(data);
 
     if (!data.hasOwnProperty("timestamp")) {
       embed.setTimestamp(new Date());
@@ -204,7 +236,7 @@ module.exports = class Client extends Discord.Client {
 
   /**
    * @param {Command} command
-   * @param {Discord.CommandInteraction} interaction
+   * @param {CommandInteraction} interaction
    * @param {any[]} args
    */
   async runCommand(command, interaction, args) {
@@ -215,7 +247,7 @@ module.exports = class Client extends Discord.Client {
 
         if (
           !isUser(interaction.member, {
-            permissions: Discord.Permissions.FLAGS.ADMINISTRATOR,
+            permissions: Permissions.FLAGS.ADMINISTRATOR,
           })
         ) {
           return await interaction.followUp({
